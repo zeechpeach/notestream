@@ -879,16 +879,17 @@ select {
   cursor: pointer;
 }
 
-/* === Fixed Export Modal Layout === */
+/* === Enhanced Export Modal Layout === */
 
-/* Make modal taller and more efficient */
+/* Make modal more spacious and responsive */
 .export-modal .modal-content {
-  max-width: 900px;
-  max-height: 85vh; /* Increased from 90vh */
-  min-height: 600px; /* Ensure minimum usable height */
+  max-width: 950px;
+  max-height: 88vh; /* Increased for better use of space */
+  min-height: 650px; /* Ensure minimum usable height */
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  width: 90vw; /* More responsive width */
 }
 
 .export-modal-content {
@@ -897,57 +898,62 @@ select {
   height: 100%;
 }
 
-/* Compact header */
+/* Optimized header */
 .export-modal .modal-header {
-  padding: 16px 20px; /* Reduced from 20px */
+  padding: 18px 24px; /* Slightly more padding for better spacing */
   flex-shrink: 0;
+  border-bottom: 2px solid var(--border-color);
 }
 
-/* More efficient controls layout */
+/* Better organized controls layout */
 .export-controls {
   background-color: #f8fafc;
-  padding: 16px 20px; /* Reduced from 20px */
+  padding: 20px 24px; /* More balanced padding */
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
-/* Compact selection controls */
+/* Enhanced selection controls */
 .selection-controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px; /* Reduced from 16px */
-  padding-bottom: 12px; /* Reduced from 16px */
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
   border-bottom: 1px solid #e2e8f0;
 }
 
 .selection-controls .actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .selection-controls button {
-  padding: 6px 12px; /* Smaller buttons */
-  font-size: 13px;
+  padding: 8px 16px; /* Better button sizing */
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 #selection-count {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--primary-color);
   font-weight: 600;
   background-color: #ede9fe;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 6px 14px;
+  border-radius: 16px;
   white-space: nowrap;
+  border: 1px solid #ddd6fe;
 }
 
-/* Horizontal export options to save vertical space */
+/* Better organized export options */
 .export-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  align-items: center;
+  gap: 20px;
+  align-items: start;
 }
 
 .export-options .form-group {
@@ -955,46 +961,53 @@ select {
 }
 
 .export-options select {
-  padding: 6px 10px;
-  font-size: 13px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  width: 100%;
 }
 
-/* Maximize notes selection area */
+/* Improved notes selection area */
 .export-modal .modal-body {
-  padding: 0; /* Remove padding to maximize space */
+  padding: 0;
   overflow-y: auto;
   flex: 1;
-  min-height: 0; /* Allow flex shrinking */
+  min-height: 0;
+  background: #fafbfc;
 }
 
 .notes-selection {
-  padding: 16px 20px;
+  padding: 20px 24px;
 }
 
 .notes-selection h4 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   color: var(--text-primary);
   position: sticky;
   top: 0;
-  background: white;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e5e7eb;
+  background: #fafbfc;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e5e7eb;
+  z-index: 10;
 }
 
-/* More efficient notes display */
+/* Enhanced notes display */
 .notes-by-video {
-  max-height: none; /* Remove artificial height limit */
+  max-height: none;
   overflow-y: visible;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Compact video headers */
+/* Better video headers */
 .video-header {
   background-color: #f8fafc;
-  padding: 10px 14px; /* Reduced padding */
+  padding: 14px 18px;
   border-bottom: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
@@ -1004,27 +1017,27 @@ select {
 .video-checkbox {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .video-meta {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
-/* More compact note items */
+/* Enhanced note items */
 .video-notes {
-  padding: 4px 0;
+  padding: 6px 0;
 }
 
 .note-checkbox {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 10px 16px; /* Reduced from 8px 16px */
+  gap: 12px;
+  padding: 12px 18px;
   cursor: pointer;
   transition: background-color 0.2s;
   border-bottom: 1px solid #f3f4f6;
@@ -1038,13 +1051,13 @@ select {
   border-bottom: none;
 }
 
-/* Better note preview layout */
+/* Enhanced note preview layout */
 .note-preview {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 0; /* Allow text truncation */
+  gap: 6px;
+  min-width: 0;
 }
 
 .note-timestamp {
@@ -1080,43 +1093,90 @@ select {
   font-weight: 500;
 }
 
-/* Compact footer */
+/* Enhanced footer */
 .export-modal .modal-footer {
-  padding: 16px 20px; /* Reduced padding */
-  border-top: 1px solid var(--border-color);
+  padding: 18px 24px; /* Better padding to match header */
+  border-top: 2px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   background-color: #f8fafc;
   flex-shrink: 0;
 }
 
 .export-modal .modal-footer button {
-  padding: 10px 18px;
+  padding: 12px 20px;
   font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
-/* Responsive improvements */
+/* Enhanced responsive improvements */
 @media (max-width: 1024px) {
   .export-modal .modal-content {
     max-width: 95vw;
-    max-height: 90vh;
+    max-height: 92vh;
+    width: 95vw;
   }
   
   .export-options {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 12px;
   }
   
   .selection-controls {
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 12px;
   }
   
   .selection-controls .actions {
     justify-content: center;
+  }
+  
+  .export-controls {
+    padding: 16px 20px;
+  }
+  
+  .notes-selection {
+    padding: 16px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .export-modal .modal-content {
+    max-width: 98vw;
+    max-height: 95vh;
+    margin: 10px;
+    width: calc(100vw - 20px);
+  }
+  
+  .export-controls {
+    padding: 14px 18px;
+  }
+  
+  .notes-selection {
+    padding: 14px 18px;
+  }
+  
+  .export-modal .modal-header {
+    padding: 16px 18px;
+  }
+  
+  .export-modal .modal-footer {
+    padding: 16px 18px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .export-modal .modal-footer button {
+    width: 100%;
+  }
+  
+  .selection-controls button {
+    flex: 1;
   }
 }
 
