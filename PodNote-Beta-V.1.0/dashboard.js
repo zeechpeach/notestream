@@ -728,11 +728,11 @@ function deleteNoteFromDashboard(noteId) {
   allNotes.splice(noteIndex, 1);
   
   // Update storage
-  chrome.storage.local.get(['podNoteData'], (result) => {
-    const podNoteData = result.podNoteData || {};
-    if (podNoteData[note.videoId]) {
-      podNoteData[note.videoId] = podNoteData[note.videoId].filter(n => n.id !== noteId);
-      chrome.storage.local.set({ podNoteData });
+  chrome.storage.local.get(['noteStreamData'], (result) => {
+    const noteStreamData = result.noteStreamData || {};
+    if (noteStreamData[note.videoId]) {
+      noteStreamData[note.videoId] = noteStreamData[note.videoId].filter(n => n.id !== noteId);
+      chrome.storage.local.set({ noteStreamData });
     }
   });
   
@@ -884,14 +884,14 @@ function updateNoteInDashboard(noteId, newText, newTags) {
   newTags.forEach(tag => addToGlobalTags(tag));
   
   // Update storage
-  chrome.storage.local.get(['podNoteData'], (result) => {
-    const podNoteData = result.podNoteData || {};
-    if (podNoteData[allNotes[noteIndex].videoId]) {
-      const videoNotes = podNoteData[allNotes[noteIndex].videoId];
+  chrome.storage.local.get(['noteStreamData'], (result) => {
+    const noteStreamData = result.noteStreamData || {};
+    if (noteStreamData[allNotes[noteIndex].videoId]) {
+      const videoNotes = noteStreamData[allNotes[noteIndex].videoId];
       const noteIndexInVideo = videoNotes.findIndex(n => n.id === noteId);
       if (noteIndexInVideo !== -1) {
         videoNotes[noteIndexInVideo] = allNotes[noteIndex];
-        chrome.storage.local.set({ podNoteData });
+        chrome.storage.local.set({ noteStreamData });
       }
     }
   });
@@ -1481,8 +1481,8 @@ function showToast(message) {
 
 function loadSettings() {
   console.log('Loading settings');
-  chrome.storage.local.get(['podNoteSettings'], (result) => {
-    const settings = result.podNoteSettings || {
+  chrome.storage.local.get(['noteStreamSettings'], (result) => {
+    const settings = result.noteStreamSettings || {
       autoActivateMinutes: 0,
       rememberChannels: true
     };
@@ -1505,7 +1505,7 @@ function saveSettings() {
     rememberChannels: elements.rememberChannelsCheckbox?.checked || false
   };
   
-  chrome.storage.local.set({ podNoteSettings: settings });
+  chrome.storage.local.set({ noteStreamSettings: settings });
   console.log('Settings saved:', settings);
 }
 
