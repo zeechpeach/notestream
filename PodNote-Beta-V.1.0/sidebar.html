@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoteStream Sidebar</title>
+  <link rel="stylesheet" href="sidebar.css">
+  <!-- Rich text editor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="sidebar">
+    <!-- Header with Video Controls -->
+    <div class="header">
+      <h1>NoteStream</h1>
+      <div class="video-controls">
+        <button id="rewind-5s" class="video-control-btn" title="Rewind 5 seconds">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+            <text x="12" y="16" text-anchor="middle" font-size="8" fill="currentColor">5</text>
+          </svg>
+        </button>
+        <button id="forward-5s" class="video-control-btn" title="Forward 5 seconds">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/>
+            <text x="12" y="16" text-anchor="middle" font-size="8" fill="currentColor">5</text>
+          </svg>
+        </button>
+        <button id="close-button" aria-label="Close sidebar">×</button>
+      </div>
+    </div>
+    
+    <!-- Compact Video Info -->
+    <div class="video-info">
+      <h4 class="subtitle">CURRENT VIDEO</h4>
+      <h3 id="video-title">Loading...</h3>
+      <p id="video-meta">Loading...</p>
+    </div>
+    
+    <!-- Enhanced Note Taking Section -->
+    <div class="quick-add">
+      <div class="note-header">
+        <h4 class="subtitle">ADD NOTE</h4>
+        <div class="timestamp-control">
+          <span id="capture-time">Capture: --:--</span>
+          <button id="use-current-time" class="time-btn" title="Use current video time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Rich Text Editor -->
+      <div class="rich-editor-container">
+        <div id="rich-editor">
+          <p>Type your note here...</p>
+        </div>
+      </div>
+      
+      <!-- Quick Tag Selection -->
+      <div class="quick-tags">
+        <h5>Quick Tags:</h5>
+        <div class="recent-tags" id="recent-tags">
+          <!-- Recently used tags appear here -->
+        </div>
+        <button id="more-tags" class="more-tags-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+          </svg>
+          More Tags
+        </button>
+      </div>
+      
+      <!-- Selected Tags Display -->
+      <div class="selected-tags" id="selected-tags">
+        <!-- Selected tags appear here -->
+      </div>
+      
+      <!-- Save Controls -->
+      <div class="save-controls">
+        <div class="time-display">
+          <span id="note-timestamp">--:--</span>
+        </div>
+        <button id="save-note" class="save-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+          </svg>
+          Save Note
+        </button>
+      </div>
+    </div>
+    
+    <!-- Enhanced Timeline -->
+    <div class="timeline-container">
+      <div class="timeline-header">
+        <span class="timeline-label">Timeline</span>
+        <span class="timeline-count" id="timeline-count">0 notes</span>
+      </div>
+      <div id="timeline">
+        <!-- Timeline markers will be added dynamically -->
+      </div>
+    </div>
+    
+    <!-- Notes List Header -->
+    <div class="notes-header">
+      <h3>Notes <span id="notes-count">(0)</span></h3>
+      <div class="notes-controls">
+        <button id="filter-button" class="control-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+          </svg>
+        </button>
+        <button id="export-notes" class="control-btn" title="Export notes">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Notes List -->
+    <div id="notes-list">
+      <!-- Notes will be added dynamically -->
+    </div>
+    
+    <!-- Tags Dropdown (hidden by default) -->
+    <div id="tags-dropdown" class="hidden">
+      <div class="tags-container">
+        <h4>Select Tags</h4>
+        <div id="all-tags-list">
+          <!-- All available tags -->
+        </div>
+        <div class="new-tag-section">
+          <input type="text" id="new-tag-input" placeholder="Create new tag...">
+          <button id="add-new-tag">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Enhanced Edit Modal -->
+  <div id="edit-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Note</h3>
+        <div class="timestamp-editor">
+          <label>Timestamp:</label>
+          <input type="text" id="edit-timestamp" placeholder="0:00">
+          <button id="sync-timestamp" title="Sync with current video time">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 4V1l-4 4 4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8z"/>
+            </svg>
+          </button>
+        </div>
+        <button class="close-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="rich-editor-container">
+          <div id="edit-rich-editor">
+            <!-- Rich text editor for editing -->
+          </div>
+        </div>
+        <div class="edit-tags-section">
+          <h5>Tags:</h5>
+          <div class="edit-tags" id="edit-tags">
+            <!-- Editable tags -->
+          </div>
+          <div class="available-edit-tags" id="available-edit-tags">
+            <!-- Available tags for selection -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="delete-note" class="delete-btn">Delete</button>
+        <div class="modal-actions">
+          <button id="cancel-edit" class="cancel-btn">Cancel</button>
+          <button id="save-edit" class="save-btn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Enhanced Export Modal -->
+  <div id="export-modal" class="modal hidden">
+    <div class="modal-content export-modal-content">
+      <div class="modal-header">
+        <h3>📤 Export Notes</h3>
+        <button class="close-modal">×</button>
+      </div>
+      
+      <div class="export-controls">
+        <div class="selection-summary">
+          <span id="selection-count">0 notes selected</span>
+          <div class="selection-actions">
+            <button id="select-all-notes" class="secondary-btn">Select All</button>
+            <button id="deselect-all-notes" class="secondary-btn">Deselect All</button>
+          </div>
+        </div>
+        
+        <div class="export-settings">
+          <div class="setting-group">
+            <label>Format:</label>
+            <select id="export-format">
+              <option value="markdown">📝 Lesson Plan (Markdown)</option>
+              <option value="study-guide">📚 Study Guide</option>
+              <option value="text">📄 Plain Text</option>
+              <option value="json">💻 JSON Data</option>
+              <option value="csv">📊 CSV Spreadsheet</option>
+            </select>
+          </div>
+          
+          <div class="setting-checkboxes">
+            <label class="checkbox-label">
+              <input type="checkbox" id="include-timestamps" checked>
+              Include timestamps & video links
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="include-tags" checked>
+              Include tags
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="group-by-video" checked>
+              Group notes by video
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-body">
+        <div class="notes-selection">
+          <h4>Select Notes to Export:</h4>
+          <div class="notes-by-video" id="export-notes-list">
+            <!-- Dynamically populated notes -->
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button id="cancel-export" class="cancel-btn">Cancel</button>
+        <button id="confirm-export" class="primary-btn" disabled>
+          Export Selected Notes
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Templates -->
+  <template id="note-template">
+    <div class="note-item">
+      <div class="note-header">
+        <div class="note-timestamp"></div>
+        <button class="edit-note-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="note-content"></div>
+      <div class="note-tags"></div>
+    </div>
+  </template>
+  
+  <script src="sidebar.js"></script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+/* Updated content.css */
+/* Styles for the NoteStream sidebar container */
+#notestream-sidebar-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  z-index: 9000;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease-in-out;
+  background-color: #ffffff;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Floating button styles */
+.notestream-floating-button {
+  position: fixed;
+  bottom: 70px;
+  right: 20px;
+  z-index: 9999;
+  transition: opacity 0.3s, transform 0.2s;
+  opacity: 0.7;
+}
+
+.notestream-floating-button:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.notestream-floating-button button {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.notestream-floating-button button:hover {
+  transform: scale(1.1);
+  background-color: #4f46e5;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.notestream-floating-button button:active {
+  transform: scale(0.95);
+}
+
+/* Sidebar visibility states */
+#notestream-sidebar-container.visible {
+  transform: translateX(0);
+}
+
+#notestream-sidebar-container.hidden {
+  transform: translateX(380px);
+}
+
+/* Enhanced tooltip for the floating button */
+.notestream-floating-button button::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -45px;
+  right: 50%;
+  transform: translateX(50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+
+.notestream-floating-button button::before {
+  content: '';
+  position: absolute;
+  bottom: -35px;
+  right: 50%;
+  transform: translateX(50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.notestream-floating-button button:hover::after,
+.notestream-floating-button button:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Smooth slide animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0.8;
+  }
+}
+
+.notestream-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.notestream-slide-out {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  #notestream-sidebar-container {
+    width: 340px;
+  }
+}
+
+@media (max-width: 768px) {
+  #notestream-sidebar-container {
+    width: 100vw;
+    right: 0;
+  }
+  
+  .notestream-floating-button {
+    bottom: 60px;
+    right: 16px;
+  }
+  
+  .notestream-floating-button button {
+    width: 44px;
+    height: 44px;
+  }
+}

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NoteStream Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h1>NoteStream</h1>
+      </div>
+      <div class="sidebar-nav">
+        <button class="nav-item active" data-view="videos">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 6h16v10H4z M10 2H8v4h2z M16 2h-2v4h2z M4 16h16v2H4z"></path>
+          </svg>
+          My Videos
+        </button>
+        <button class="nav-item" data-view="all-notes">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+          </svg>
+          All Notes
+        </button>
+        <button class="nav-item" data-view="settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path>
+          </svg>
+          Settings
+        </button>
+      </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Videos View -->
+      <div id="videos-view" class="view">
+        <div class="view-header">
+          <h2>My Videos</h2>
+          <div class="search-bar">
+            <input type="text" id="video-search" placeholder="Search videos...">
+            <button id="video-search-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div id="videos-container" class="videos-grid">
+          <!-- Videos will be added dynamically -->
+        </div>
+      </div>
+      
+      <!-- All Notes View -->
+      <div id="all-notes-view" class="view hidden">
+        <div class="view-header">
+          <h2>All Notes</h2>
+          <div class="filter-controls">
+            <div class="search-bar">
+              <input type="text" id="notes-search" placeholder="Search notes...">
+              <button id="notes-search-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                </svg>
+              </button>
+            </div>
+            <select id="tag-filter">
+              <option value="">All Tags</option>
+              <!-- Tag options will be added dynamically -->
+            </select>
+          </div>
+        </div>
+        
+        <div id="all-notes-container" class="notes-list">
+          <!-- Notes will be added dynamically -->
+        </div>
+      </div>
+      
+      <!-- Single Video View -->
+      <div id="single-video-view" class="view hidden">
+        <div class="view-header with-back">
+          <button id="back-to-videos" class="back-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+            </svg>
+            Back to Videos
+          </button>
+          <div class="actions">
+            <button id="export-video-notes" class="secondary-button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"></path>
+              </svg>
+              Export Notes
+            </button>
+            <button id="open-in-youtube" class="primary-button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 15V6l7 6-7 6z"></path>
+              </svg>
+              Open in YouTube
+            </button>
+          </div>
+        </div>
+        
+        <div class="video-details">
+          <div id="video-info">
+            <!-- Video info will be added dynamically -->
+          </div>
+          
+          <div class="view-header sub-header">
+            <h3>Video Notes</h3>
+            <div class="filter-controls">
+              <select id="video-tag-filter">
+                <option value="">All Tags</option>
+                <!-- Tag options will be added dynamically -->
+              </select>
+            </div>
+          </div>
+          
+          <div id="video-timeline" class="video-timeline">
+            <!-- Timeline markers will be added dynamically -->
+          </div>
+          
+          <div id="video-notes-container" class="notes-list">
+            <!-- Notes will be added dynamically -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Settings View -->
+      <div id="settings-view" class="view hidden">
+        <div class="view-header">
+          <h2>Settings</h2>
+        </div>
+        
+        <div class="settings-form">
+          <div class="setting-group">
+            <h3>General Settings</h3>
+            
+            <div class="setting-item">
+              <label>Auto-activate sidebar after
+                <select id="auto-activate">
+                  <option value="0">Never</option>
+                  <option value="1">1 minute</option>
+                  <option value="3">3 minutes</option>
+                  <option value="5">5 minutes</option>
+                  <option value="10">10 minutes</option>
+                </select>
+              </label>
+            </div>
+            
+            <div class="setting-item">
+              <label class="checkbox-label">
+                <input type="checkbox" id="remember-channels" checked>
+                Remember sidebar preference for each channel
+              </label>
+            </div>
+          </div>
+          
+          <div class="setting-group">
+            <h3>Keyboard Shortcuts</h3>
+            
+            <div class="shortcut-item">
+              <span>Toggle sidebar</span>
+              <span class="shortcut-keys">Alt+N</span>
+            </div>
+            <div class="shortcut-item">
+              <span>Save note</span>
+              <span class="shortcut-keys">Alt+S</span>
+            </div>
+          </div>
+          
+          <div class="setting-group">
+            <h3>Data Management</h3>
+            
+            <div class="setting-item">
+              <button id="export-all-data" class="secondary-button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"></path>
+                </svg>
+                Export Notes
+              </button>
+            </div>
+            
+            <div class="setting-item">
+              <button id="clear-all-data" class="danger-button">Clear All Data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Export Modal -->
+  <div id="export-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Export Notes</h3>
+        <button class="close-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="export-format">Export Format</label>
+          <select id="export-format">
+            <option value="markdown">Lesson Plan (.md)</option>
+            <option value="study-guide">Study Guide (.md)</option>
+            <option value="text">Plain Text (.txt)</option>
+            <option value="json">JSON (.json)</option>
+            <option value="csv">CSV (.csv)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="include-timestamps" checked>
+            Include timestamps
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="include-tags" checked>
+            Include tags
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-export" class="secondary-button">Cancel</button>
+        <button id="confirm-export" class="primary-button">Export</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="dashboard.js"></script>
+</body>
+</html>
