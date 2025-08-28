@@ -77,13 +77,7 @@ function initializeRichEditors() {
       placeholder: 'Edit your note...'
     });
     
-    // Track typing start time for smart timestamping
-    richEditor.on('text-change', (delta, oldDelta, source) => {
-      if (source === 'user' && !startTypingTime) {
-        startTypingTime = Date.now();
-        requestCurrentTime();
-      }
-    });
+    // Rich editor initialized - smart timestamping will be set up separately
     
     console.log('Rich text editors initialized');
   } else {
@@ -205,18 +199,123 @@ function setupVideoControls() {
   }
 }
 
-// Smart Timestamping
+// Enhanced Smart Timestamping
 function setupSmartTimestamping() {
   if (elements.useCurrentTimeBtn) {
     elements.useCurrentTimeBtn.addEventListener('click', () => {
-      requestCurrentTime();
-      setTimeout(() => {
-        captureTimestamp = parseTimestamp(elements.noteTimestamp.textContent);
-        elements.captureTime.textContent = `Capture: ${formatTime(captureTimestamp)}`;
-        showNotification('Timestamp captured!', 'success');
-      }, 100);
+      captureCurrentTimestamp();
     });
   }
+  
+  // Auto-sync timestamp when user starts typing
+  if (richEditor) {
+    richEditor.on('text-change', (delta, oldDelta, source) => {
+      if (source === 'user' && !startTypingTime) {
+        startTypingTime = Date.now();
+        // Auto-capture timestamp when user starts typing
+        setTimeout(() => {
+          if (!captureTimestamp) {
+            captureCurrentTimestamp(true); // Auto-capture mode
+          }
+        }, 100);
+      }
+      
+      // Show tag suggestions after user types
+      if (source === 'user') {
+        setTimeout(showTagSuggestions, 500); // Debounce suggestions
+      }
+    });
+  }
+  
+  // Keyboard shortcut for manual timestamp capture (Ctrl/Cmd + T)
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+      e.preventDefault();
+      captureCurrentTimestamp();
+    }
+  });
+}
+
+// Show intelligent tag suggestions based on note content
+function showTagSuggestions() {
+  if (!richEditor) return;
+  
+  const noteText = richEditor.getText().trim();
+  if (noteText.length < 10) {
+    hideTagSuggestions();
+    return;
+  }
+  
+  const suggestions = suggestTagsForNote(noteText, currentVideoInfo);
+  if (suggestions.length === 0) {
+    hideTagSuggestions();
+    return;
+  }
+  
+  // Filter out already selected tags
+  const filteredSuggestions = suggestions.filter(tag => !selectedTags.includes(tag));
+  if (filteredSuggestions.length === 0) {
+    hideTagSuggestions();
+    return;
+  }
+  
+  const suggestionsContainer = document.getElementById('tag-suggestions');
+  const suggestionsList = document.getElementById('suggested-tags-list');
+  
+  if (suggestionsContainer && suggestionsList) {
+    suggestionsList.innerHTML = '';
+    
+    filteredSuggestions.forEach(tag => {
+      const tagElement = document.createElement('span');
+      tagElement.className = 'suggested-tag';
+      tagElement.textContent = tag;
+      
+      tagElement.addEventListener('click', () => {
+        if (!selectedTags.includes(tag)) {
+          selectedTags.push(tag);
+          addToGlobalTags(tag);
+          updateSelectedTagsDisplay();
+          showNotification(`Added tag: "${tag}"`, 'success');
+          showTagSuggestions(); // Refresh suggestions
+        }
+      });
+      
+      suggestionsList.appendChild(tagElement);
+    });
+    
+    suggestionsContainer.style.display = 'block';
+  }
+}
+
+function hideTagSuggestions() {
+  const suggestionsContainer = document.getElementById('tag-suggestions');
+  if (suggestionsContainer) {
+    suggestionsContainer.style.display = 'none';
+  }
+}
+
+// Enhanced timestamp capture with visual feedback
+function captureCurrentTimestamp(autoMode = false) {
+  requestCurrentTime();
+  setTimeout(() => {
+    captureTimestamp = parseTimestamp(elements.noteTimestamp.textContent);
+    elements.captureTime.textContent = `Capture: ${formatTime(captureTimestamp)}`;
+    
+    // Visual feedback
+    elements.captureTime.style.backgroundColor = '#10b981';
+    elements.captureTime.style.color = 'white';
+    elements.captureTime.style.transform = 'scale(1.05)';
+    
+    // Reset visual feedback
+    setTimeout(() => {
+      elements.captureTime.style.backgroundColor = '';
+      elements.captureTime.style.color = '';
+      elements.captureTime.style.transform = '';
+    }, 1000);
+    
+    const message = autoMode ? 'Timestamp auto-captured!' : 'Timestamp captured!';
+    showNotification(message, 'success');
+  }, 100);
 }
 
 // Enhanced Note Saving with Rich Text
@@ -248,9 +347,8 @@ function saveNote() {
   if (finalTags.length === 0) {
     const suggestions = suggestTagsForNote(noteText, currentVideoInfo);
     if (suggestions.length > 0) {
-      finalTags.push(suggestions[0]);
-      addToGlobalTags(suggestions[0]);
-      showNotification(`Auto-tagged: ${suggestions[0]}`, 'info');
+      finalTags.push(suggestions[0]); // Auto-apply top suggestion
+      showNotification(`Auto-applied tag: "${suggestions[0]}"`, 'info');
     }
   }
   
@@ -1386,16 +1484,17 @@ function initSidebar() {
   loadGlobalTags();
   
   // Initialize rich text editors
-  setTimeout(initializeRichEditors, 100); // Small delay to ensure DOM is ready
+  setTimeout(() => {
+    initializeRichEditors();
+    // Set up smart timestamping after editors are ready
+    setTimeout(setupSmartTimestamping, 100);
+  }, 100); // Small delay to ensure DOM is ready
   
   // Set up all event listeners
   setupEventListeners();
   
   // Setup video controls
   setupVideoControls();
-  
-  // Setup smart timestamping
-  setupSmartTimestamping();
   
   // Setup communication with parent
   window.addEventListener('message', handleParentMessages);
