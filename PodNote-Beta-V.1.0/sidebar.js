@@ -183,51 +183,41 @@ class NativeRichEditor {
     }, 0);
   }
   
-  // API methods to match Quill interface
+  // API methods - simplified and clean
   getText() {
     return this.container.textContent || '';
   }
-  
-  getContents() {
-    return {
-      ops: [{ insert: this.getText() }]
-    };
-  }
-  
+
   setContents(content) {
     if (typeof content === 'string') {
-      // If it's HTML content (from old Quill or rich content), set as innerHTML
+      // Handle both HTML content and plain text
       if (content.includes('<') && content.includes('>')) {
         this.container.innerHTML = content;
       } else {
-        // Plain text
         this.container.textContent = content;
       }
-    } else if (content && content.ops) {
-      // Quill Delta format - extract text content
-      this.container.textContent = content.ops.map(op => op.insert || '').join('');
-    } else if (content) {
-      // Fallback - try to convert to string
-      this.container.textContent = String(content);
+    } else {
+      // Fallback - convert to string
+      this.container.textContent = String(content || '');
     }
     this.updatePlaceholder();
   }
-  
+
   setText(text) {
     this.container.textContent = text || '';
     this.updatePlaceholder();
   }
-  
+
   get root() {
     return {
       innerHTML: this.container.innerHTML
     };
   }
-  
+
   focus() {
     this.container.focus();
   }
-  
+
   blur() {
     this.container.blur();
   }
@@ -441,9 +431,9 @@ function setupSmartTimestamping() {
   }
   
   // Auto-sync timestamp when user starts typing
-  if (richEditor) {
-    richEditor.on('text-change', (delta, oldDelta, source) => {
-      if (source === 'user' && !startTypingTime) {
+  if (richEditor && richEditor.container) {
+    richEditor.container.addEventListener('input', () => {
+      if (!startTypingTime) {
         startTypingTime = Date.now();
         // Auto-capture timestamp when user starts typing
         setTimeout(() => {
@@ -454,9 +444,7 @@ function setupSmartTimestamping() {
       }
       
       // Show tag suggestions after user types
-      if (source === 'user') {
-        setTimeout(showTagSuggestions, 500); // Debounce suggestions
-      }
+      setTimeout(showTagSuggestions, 500); // Debounce suggestions
     });
   }
   
@@ -554,14 +542,12 @@ function captureCurrentTimestamp(autoMode = false) {
 // Enhanced Note Saving with Rich Text
 function saveNote() {
   let noteText = '';
+  let richContent = '';
   
   if (richEditor) {
-    // Get rich text content
-    const delta = richEditor.getContents();
+    // Get text and rich content
     noteText = richEditor.getText().trim();
-    
-    // Store rich text format for future use
-    var richContent = richEditor.root.innerHTML;
+    richContent = richEditor.root.innerHTML;
   } else {
     noteText = document.getElementById('rich-editor')?.textContent?.trim() || '';
   }
