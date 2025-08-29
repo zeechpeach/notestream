@@ -50,38 +50,204 @@ const elements = {
   noteTemplate: document.getElementById('note-template'),
 };
 
-// Rich Text Editor Configuration
-const editorConfig = {
-  theme: 'snow',
-  modules: {
-    toolbar: [
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      ['link'],
-      ['clean']
-    ]
-  },
-  placeholder: 'Type your note here...',
-  formats: ['bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link']
-};
+// Native Rich Text Editor Configuration
+class NativeRichEditor {
+  constructor(container, options = {}) {
+    this.container = typeof container === 'string' ? document.querySelector(container) : container;
+    this.toolbar = this.container.previousElementSibling;
+    this.options = {
+      placeholder: 'Type your note here...',
+      ...options
+    };
+    
+    this.init();
+  }
+  
+  init() {
+    // Set placeholder
+    this.container.setAttribute('data-placeholder', this.options.placeholder);
+    
+    // Handle placeholder visibility
+    this.updatePlaceholder();
+    
+    // Set up event listeners
+    this.setupEventListeners();
+    
+    // Initialize toolbar
+    this.setupToolbar();
+  }
+  
+  setupEventListeners() {
+    // Handle placeholder
+    this.container.addEventListener('input', () => this.updatePlaceholder());
+    this.container.addEventListener('focus', () => this.updatePlaceholder());
+    this.container.addEventListener('blur', () => this.updatePlaceholder());
+    
+    // Handle keyboard shortcuts
+    this.container.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
+    
+    // Prevent default behavior for some commands
+    this.container.addEventListener('paste', (e) => this.handlePaste(e));
+  }
+  
+  setupToolbar() {
+    if (!this.toolbar) return;
+    
+    this.toolbar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.toolbar-btn');
+      if (!btn) return;
+      
+      e.preventDefault();
+      const command = btn.getAttribute('data-command');
+      this.executeCommand(command);
+    });
+  }
+  
+  updatePlaceholder() {
+    const isEmpty = this.container.textContent.trim() === '' || 
+                   (this.container.innerHTML === '<p><br></p>' || this.container.innerHTML === '<br>');
+    this.container.classList.toggle('empty', isEmpty);
+    
+    // Ensure we have at least one paragraph for consistent behavior
+    if (isEmpty && this.container.innerHTML === '') {
+      this.container.innerHTML = '<p><br></p>';
+    }
+  }
+  
+  executeCommand(command) {
+    this.container.focus();
+    
+    try {
+      if (command === 'createLink') {
+        const url = prompt('Enter link URL:', 'https://');
+        if (url && url !== 'https://') {
+          document.execCommand(command, false, url);
+        }
+      } else {
+        document.execCommand(command, false, null);
+      }
+    } catch (error) {
+      console.warn('Command not supported:', command);
+    }
+    
+    this.updateToolbarState();
+  }
+  
+  updateToolbarState() {
+    if (!this.toolbar) return;
+    
+    const buttons = this.toolbar.querySelectorAll('.toolbar-btn');
+    buttons.forEach(btn => {
+      const command = btn.getAttribute('data-command');
+      try {
+        const isActive = document.queryCommandState(command);
+        btn.classList.toggle('active', isActive);
+      } catch (error) {
+        // Command not supported
+      }
+    });
+  }
+  
+  handleKeyboardShortcuts(e) {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case 'b':
+          e.preventDefault();
+          this.executeCommand('bold');
+          break;
+        case 'i':
+          e.preventDefault();
+          this.executeCommand('italic');
+          break;
+        case 'u':
+          e.preventDefault();
+          this.executeCommand('underline');
+          break;
+      }
+    }
+  }
+  
+  handlePaste(e) {
+    // Allow paste but clean up formatting if needed
+    setTimeout(() => {
+      this.updatePlaceholder();
+      this.updateToolbarState();
+    }, 0);
+  }
+  
+  // API methods to match Quill interface
+  getText() {
+    return this.container.textContent || '';
+  }
+  
+  getContents() {
+    return {
+      ops: [{ insert: this.getText() }]
+    };
+  }
+  
+  setContents(content) {
+    if (typeof content === 'string') {
+      // If it's HTML content (from old Quill or rich content), set as innerHTML
+      if (content.includes('<') && content.includes('>')) {
+        this.container.innerHTML = content;
+      } else {
+        // Plain text
+        this.container.textContent = content;
+      }
+    } else if (content && content.ops) {
+      // Quill Delta format - extract text content
+      this.container.textContent = content.ops.map(op => op.insert || '').join('');
+    } else if (content) {
+      // Fallback - try to convert to string
+      this.container.textContent = String(content);
+    }
+    this.updatePlaceholder();
+  }
+  
+  setText(text) {
+    this.container.textContent = text || '';
+    this.updatePlaceholder();
+  }
+  
+  get root() {
+    return {
+      innerHTML: this.container.innerHTML
+    };
+  }
+  
+  focus() {
+    this.container.focus();
+  }
+  
+  blur() {
+    this.container.blur();
+  }
+}
 
-// Initialize Rich Text Editors
+// Initialize Native Rich Text Editors
 function initializeRichEditors() {
-  if (typeof Quill !== 'undefined') {
+  try {
     // Main editor
-    richEditor = new Quill('#rich-editor', editorConfig);
+    const mainEditorElement = document.getElementById('rich-editor');
+    if (mainEditorElement) {
+      richEditor = new NativeRichEditor('#rich-editor', {
+        placeholder: 'Type your note here...'
+      });
+    }
     
     // Edit modal editor
-    editRichEditor = new Quill('#edit-rich-editor', {
-      ...editorConfig,
-      placeholder: 'Edit your note...'
-    });
+    const editEditorElement = document.getElementById('edit-rich-editor');
+    if (editEditorElement) {
+      editRichEditor = new NativeRichEditor('#edit-rich-editor', {
+        placeholder: 'Edit your note...'
+      });
+    }
     
-    // Rich editor initialized - smart timestamping will be set up separately
-    
-    console.log('Rich text editors initialized');
-  } else {
-    console.warn('Quill not loaded, falling back to plain text');
+    console.log('Native rich text editors initialized');
+  } catch (error) {
+    console.warn('Error initializing rich text editors:', error);
+    // Fallback to plain text if needed
   }
 }
 
@@ -460,6 +626,83 @@ function setupExportModalEvents() {
   const modal = elements.exportModal;
   let selectedNotesForExport = new Set();
   
+  // Tab functionality
+  const tabButtons = modal.querySelectorAll('.tab-btn');
+  const tabPanes = modal.querySelectorAll('.tab-pane');
+  
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+      
+      // Update active tab button
+      tabButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update active tab pane
+      tabPanes.forEach(pane => pane.classList.remove('active'));
+      const targetPane = modal.querySelector(`#${targetTab}-tab`);
+      if (targetPane) {
+        targetPane.classList.add('active');
+      }
+      
+      // Update preview if preview tab is selected
+      if (targetTab === 'preview') {
+        updateExportPreview(selectedNotesForExport);
+      }
+    });
+  });
+  
+  // Function to update export preview
+  function updateExportPreview(selectedNotes) {
+    const previewElement = document.getElementById('export-preview-content');
+    if (!previewElement) return;
+    
+    const format = document.getElementById('export-format')?.value || 'markdown';
+    const includeTimestamps = document.getElementById('include-timestamps')?.checked ?? true;
+    const includeTags = document.getElementById('include-tags')?.checked ?? true;
+    const groupByVideo = document.getElementById('group-by-video')?.checked ?? true;
+    
+    const selectedNotesList = notesList.filter(note => selectedNotes.has(note.id));
+    
+    if (selectedNotesList.length === 0) {
+      previewElement.textContent = 'No notes selected. Please select notes from the "Select Notes" tab to see a preview.';
+      return;
+    }
+    
+    let previewContent = '';
+    
+    try {
+      switch (format) {
+        case 'markdown':
+          previewContent = generateLessonPlanExport(selectedNotesList, includeTimestamps, includeTags, groupByVideo);
+          break;
+        case 'study-guide':
+          previewContent = generateStudyGuideExport(selectedNotesList, includeTimestamps, includeTags, groupByVideo);
+          break;
+        case 'text':
+          previewContent = generateTextExport(selectedNotesList, includeTimestamps, includeTags, groupByVideo);
+          break;
+        case 'json':
+          previewContent = JSON.stringify(selectedNotesList, null, 2);
+          break;
+        case 'csv':
+          previewContent = generateCsvExport(selectedNotesList, includeTimestamps, includeTags);
+          break;
+        default:
+          previewContent = 'Preview not available for this format.';
+      }
+      
+      // Limit preview to first 1000 characters for performance
+      if (previewContent.length > 1000) {
+        previewContent = previewContent.substring(0, 1000) + '\n\n... (preview truncated - full content will be exported)';
+      }
+      
+      previewElement.textContent = previewContent;
+    } catch (error) {
+      previewElement.textContent = 'Error generating preview: ' + error.message;
+    }
+  }
+  
   // Note selection handling
   modal.addEventListener('change', (e) => {
     if (e.target.classList.contains('note-select')) {
@@ -470,6 +713,10 @@ function setupExportModalEvents() {
         selectedNotesForExport.delete(noteId);
       }
       updateExportSelectionCount(selectedNotesForExport.size);
+      // Update preview if preview tab is active
+      if (modal.querySelector('#preview-tab').classList.contains('active')) {
+        updateExportPreview(selectedNotesForExport);
+      }
     }
     
     if (e.target.classList.contains('video-select')) {
@@ -486,6 +733,22 @@ function setupExportModalEvents() {
         }
       });
       updateExportSelectionCount(selectedNotesForExport.size);
+      // Update preview if preview tab is active
+      if (modal.querySelector('#preview-tab').classList.contains('active')) {
+        updateExportPreview(selectedNotesForExport);
+      }
+    }
+  });
+  
+  // Update preview when export settings change
+  ['export-format', 'include-timestamps', 'include-tags', 'group-by-video'].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('change', () => {
+        if (modal.querySelector('#preview-tab').classList.contains('active')) {
+          updateExportPreview(selectedNotesForExport);
+        }
+      });
     }
   });
   
@@ -503,6 +766,10 @@ function setupExportModalEvents() {
         checkbox.checked = true;
       });
       updateExportSelectionCount(selectedNotesForExport.size);
+      // Update preview if preview tab is active
+      if (modal.querySelector('#preview-tab').classList.contains('active')) {
+        updateExportPreview(selectedNotesForExport);
+      }
     });
   }
   
@@ -513,6 +780,10 @@ function setupExportModalEvents() {
       });
       selectedNotesForExport.clear();
       updateExportSelectionCount(0);
+      // Update preview if preview tab is active
+      if (modal.querySelector('#preview-tab').classList.contains('active')) {
+        updateExportPreview(selectedNotesForExport);
+      }
     });
   }
   
@@ -613,7 +884,7 @@ function showEditNoteModal(note) {
   // Set rich text content
   if (editRichEditor) {
     if (note.richContent) {
-      editRichEditor.root.innerHTML = note.richContent;
+      editRichEditor.setContents(note.richContent);
     } else {
       editRichEditor.setText(note.text);
     }

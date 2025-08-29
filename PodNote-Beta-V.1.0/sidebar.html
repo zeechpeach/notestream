@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NoteStream Sidebar</title>
   <link rel="stylesheet" href="sidebar.css">
-  <!-- Rich text editor -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet">
+  <!-- Native rich text editor - no external dependencies -->
 </head>
 <body>
   <div class="sidebar">
@@ -52,9 +50,48 @@
         </div>
       </div>
       
-      <!-- Rich Text Editor -->
+      <!-- Native Rich Text Editor -->
       <div class="rich-editor-container">
-        <div id="rich-editor">
+        <div class="rich-toolbar" id="rich-toolbar">
+          <button type="button" data-command="bold" title="Bold (Ctrl/Cmd+B)" class="toolbar-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
+            </svg>
+          </button>
+          <button type="button" data-command="italic" title="Italic (Ctrl/Cmd+I)" class="toolbar-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/>
+            </svg>
+          </button>
+          <button type="button" data-command="underline" title="Underline (Ctrl/Cmd+U)" class="toolbar-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
+            </svg>
+          </button>
+          <div class="toolbar-divider"></div>
+          <button type="button" data-command="insertUnorderedList" title="Bullet List" class="toolbar-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/>
+            </svg>
+          </button>
+          <button type="button" data-command="insertOrderedList" title="Numbered List" class="toolbar-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/>
+            </svg>
+          </button>
+          <div class="toolbar-divider"></div>
+          <button type="button" data-command="createLink" title="Insert Link" class="toolbar-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+            </svg>
+          </button>
+          <button type="button" data-command="removeFormat" title="Clear Formatting" class="toolbar-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 5v.18L8.82 8h2.4l-.72 1.68 2.1 2.1L14.21 8H20V6H6zm-.27 14.18L17.27 7.73l-1.41-1.41L14.45 7.6 11.82 5h-5.6v1.18L5.05 7.35 3.91 8.49 2.05 6.63.64 8.05l8.28 8.28L7.73 18H10v-1.82l.95-.95L9.77 16.4 5.73 19.18z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="rich-editor" contenteditable="true" class="rich-editor" role="textbox" aria-label="Note content">
           <p>Type your note here...</p>
         </div>
       </div>
@@ -167,7 +204,46 @@
       </div>
       <div class="modal-body">
         <div class="rich-editor-container">
-          <div id="edit-rich-editor">
+          <div class="rich-toolbar" id="edit-rich-toolbar">
+            <button type="button" data-command="bold" title="Bold (Ctrl/Cmd+B)" class="toolbar-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
+              </svg>
+            </button>
+            <button type="button" data-command="italic" title="Italic (Ctrl/Cmd+I)" class="toolbar-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/>
+              </svg>
+            </button>
+            <button type="button" data-command="underline" title="Underline (Ctrl/Cmd+U)" class="toolbar-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
+              </svg>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button type="button" data-command="insertUnorderedList" title="Bullet List" class="toolbar-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/>
+              </svg>
+            </button>
+            <button type="button" data-command="insertOrderedList" title="Numbered List" class="toolbar-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/>
+              </svg>
+            </button>
+            <div class="toolbar-divider"></div>
+            <button type="button" data-command="createLink" title="Insert Link" class="toolbar-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+              </svg>
+            </button>
+            <button type="button" data-command="removeFormat" title="Clear Formatting" class="toolbar-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 5v.18L8.82 8h2.4l-.72 1.68 2.1 2.1L14.21 8H20V6H6zm-.27 14.18L17.27 7.73l-1.41-1.41L14.45 7.6 11.82 5h-5.6v1.18L5.05 7.35 3.91 8.49 2.05 6.63.64 8.05l8.28 8.28L7.73 18H10v-1.82l.95-.95L9.77 16.4 5.73 19.18z"/>
+              </svg>
+            </button>
+          </div>
+          <div id="edit-rich-editor" contenteditable="true" class="rich-editor" role="textbox" aria-label="Edit note content">
             <!-- Rich text editor for editing -->
           </div>
         </div>
@@ -238,10 +314,28 @@
       </div>
       
       <div class="modal-body">
-        <div class="notes-selection">
-          <h4>Select Notes to Export:</h4>
-          <div class="notes-by-video" id="export-notes-list">
-            <!-- Dynamically populated notes -->
+        <div class="export-tabs">
+          <button class="tab-btn active" data-tab="selection">📋 Select Notes</button>
+          <button class="tab-btn" data-tab="preview">👁️ Preview Export</button>
+        </div>
+        
+        <div class="tab-content">
+          <div class="tab-pane active" id="selection-tab">
+            <div class="notes-selection">
+              <h4>Select Notes to Export:</h4>
+              <div class="notes-by-video" id="export-notes-list">
+                <!-- Dynamically populated notes -->
+              </div>
+            </div>
+          </div>
+          
+          <div class="tab-pane" id="preview-tab">
+            <div class="export-preview">
+              <h4>Export Preview:</h4>
+              <div class="preview-container">
+                <pre id="export-preview-content">Select notes and choose export options to see preview...</pre>
+              </div>
+            </div>
           </div>
         </div>
       </div>
