@@ -311,7 +311,8 @@ if (elements.exportVideoNotesBtn) {
 if (elements.exportAllDataBtn) {
   elements.exportAllDataBtn.addEventListener('click', () => {
     console.log('Export all data clicked');
-    showSelectiveExportModal('all');
+    // Show the simple export modal
+    elements.exportModal?.classList.remove('hidden');
   });
 }
   
@@ -344,7 +345,7 @@ if (elements.exportAllDataBtn) {
     elements.cancelExportBtn.addEventListener('click', closeExportModal);
   }
   if (elements.confirmExportBtn) {
-    elements.confirmExportBtn.addEventListener('click', handleSelectiveExport);
+    elements.confirmExportBtn.addEventListener('click', handleBasicExport);
   }
   
   console.log('Event listeners set up complete');
@@ -1886,6 +1887,61 @@ function closeExportModal() {
   if (modal) {
     modal.classList.add('hidden');
   }
+}
+
+function handleBasicExport() {
+  const format = elements.exportFormatSelect?.value || 'markdown';
+  const includeTimestamps = elements.includeTimestampsCheckbox?.checked || true;
+  const includeTags = elements.includeTagsCheckbox?.checked || true;
+  
+  let content = '';
+  let filename = '';
+  
+  // Use all notes for basic export
+  const notesToExport = allNotes;
+  
+  if (notesToExport.length === 0) {
+    alert('No notes to export');
+    return;
+  }
+  
+  switch (format) {
+    case 'markdown':
+      content = generateLessonPlanExport(notesToExport, includeTimestamps, includeTags, true);
+      filename = `notestream-lesson-plan-${new Date().toISOString().split('T')[0]}.md`;
+      break;
+    case 'study-guide':
+      content = generateStudyGuideExport(notesToExport, includeTimestamps, includeTags, true);
+      filename = `notestream-study-guide-${new Date().toISOString().split('T')[0]}.md`;
+      break;
+    case 'text':
+      content = generateTextExport(notesToExport, includeTimestamps, includeTags, true);
+      filename = `notestream-notes-${new Date().toISOString().split('T')[0]}.txt`;
+      break;
+    case 'json':
+      content = JSON.stringify({
+        exportDate: new Date().toISOString(),
+        totalNotes: notesToExport.length,
+        notes: notesToExport.map(note => ({
+          ...note,
+          exportIncludesTimestamps: includeTimestamps,
+          exportIncludesTags: includeTags
+        }))
+      }, null, 2);
+      filename = `notestream-data-${new Date().toISOString().split('T')[0]}.json`;
+      break;
+    case 'csv':
+      content = generateCsvExport(notesToExport, includeTimestamps, includeTags);
+      filename = `notestream-notes-${new Date().toISOString().split('T')[0]}.csv`;
+      break;
+  }
+  
+  // Download file
+  downloadFile(content, filename, format);
+  
+  // Close modal and show success message
+  closeExportModal();
+  alert(`Exported ${notesToExport.length} notes successfully!`);
 }
 
 function downloadFile(content, filename, format) {
