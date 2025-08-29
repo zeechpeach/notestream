@@ -88,7 +88,7 @@ body {
 
 /* Compact Video Info */
 .video-info {
-  padding: 12px 20px;
+  padding: 10px 20px;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
 }
@@ -121,7 +121,7 @@ body {
 
 /* Enhanced Note Taking Section */
 .quick-add {
-  padding: 20px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-primary);
   flex-shrink: 0;
@@ -131,7 +131,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 /* Quick Video Controls (positioned near note-taking area) */
@@ -139,7 +139,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   padding: 8px 12px;
   background: var(--bg-secondary);
   border-radius: 8px;
@@ -214,7 +214,7 @@ body {
 
 /* Native Rich Text Editor Container */
 .rich-editor-container {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 /* Rich Text Toolbar */
@@ -329,7 +329,7 @@ body {
 
 /* Quick Tags Section */
 .quick-tags {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .quick-tags h5 {
@@ -452,12 +452,21 @@ body {
   }
 }
 
+/* Combined Tags and Save Controls */
+.tags-save-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
 /* Selected Tags Display */
 .selected-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   min-height: 24px;
 }
 
@@ -487,12 +496,7 @@ body {
   background: rgba(0, 0, 0, 0.2);
 }
 
-/* Save Controls */
-.save-controls {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
+/* Save Button (now in combined controls) */
 
 .save-btn {
   background: var(--primary-color);
@@ -518,9 +522,9 @@ body {
   transform: translateY(0);
 }
 
-/* Enhanced Timeline - Smaller for better scrolling */
+/* Enhanced Timeline - More compact for better scrolling */
 .timeline-container {
-  padding: 8px 20px 12px;
+  padding: 6px 20px 8px;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
 }
@@ -529,7 +533,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .timeline-label {
@@ -544,10 +548,10 @@ body {
 }
 
 #timeline {
-  height: 18px;
+  height: 16px;
   background: white;
   border: 1px solid var(--border-color);
-  border-radius: 9px;
+  border-radius: 8px;
   position: relative;
   overflow: hidden;
 }
@@ -572,7 +576,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 20px;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-primary);
 }
