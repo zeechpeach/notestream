@@ -86,73 +86,65 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Compact Video Info */
+/* Compact Video Info - Single Line */
 .video-info {
-  padding: 10px 20px;
+  padding: 8px 20px;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
 }
 
-.subtitle {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.video-info-compact {
+  font-size: 12px;
+  color: var(--text-primary);
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 #video-title {
-  font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 #video-meta {
-  font-size: 11px;
   color: var(--text-secondary);
 }
 
-/* Enhanced Note Taking Section */
+/* Enhanced Note Taking Section - More Compact */
 .quick-add {
-  padding: 16px 20px;
+  padding: 12px 20px;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-primary);
   flex-shrink: 0;
 }
 
-.note-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-/* Quick Video Controls (positioned near note-taking area) */
-.quick-video-controls {
+/* Consolidated Timestamp and Video Controls */
+.compact-controls {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
-  padding: 8px 12px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
   background: var(--bg-secondary);
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.control-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .quick-control-btn {
   background: white;
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -167,29 +159,22 @@ body {
 }
 
 .current-time {
-  margin-left: auto;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
   font-family: monospace;
   background: white;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 3px 6px;
+  border-radius: 3px;
   border: 1px solid var(--border-color);
 }
 
-.timestamp-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 #capture-time {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
   font-family: monospace;
-  background: var(--bg-secondary);
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: white;
+  padding: 3px 6px;
+  border-radius: 3px;
   border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
@@ -198,9 +183,9 @@ body {
   background: var(--success-color);
   border: none;
   color: white;
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -327,34 +312,38 @@ body {
   opacity: 0.5; /* Make placeholder slightly transparent when focused */
 }
 
-/* Quick Tags Section */
+/* Quick Tags Section - Inline Layout */
 .quick-tags {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+}
+
+.tags-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
 }
 
 .quick-tags h5 {
   font-size: 12px;
   color: var(--text-secondary);
-  margin-bottom: 8px;
   font-weight: 500;
+  flex-shrink: 0;
 }
 
 .recent-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
-  min-height: 32px;
-  padding: 6px;
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+  gap: 4px;
+  flex: 1;
+  min-height: 24px;
 }
 
 .quick-tag {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 11px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -370,14 +359,12 @@ body {
   background: none;
   border: 1px dashed var(--border-color);
   color: var(--text-secondary);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  flex-shrink: 0;
 }
 
 .more-tags-btn:hover {
@@ -452,13 +439,11 @@ body {
   }
 }
 
-/* Combined Tags and Save Controls */
-.tags-save-controls {
+/* Save Controls */
+.save-controls {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-top: 4px;
+  justify-content: flex-end;
+  margin-top: 6px;
 }
 
 /* Selected Tags Display */
@@ -624,12 +609,12 @@ body {
   border-color: var(--primary-color);
 }
 
-/* Notes List */
+/* Notes List - Optimized for Better Space Utilization */
 #notes-list {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 10px 20px 20px;
+  padding: 8px 20px 20px;
   background: var(--bg-secondary);
   min-height: 0; /* Ensure flex item can shrink */
   /* Remove max-height constraint to allow full flex growth */
@@ -641,9 +626,9 @@ body {
 .note-item {
   background: white;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  margin-bottom: 12px;
-  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  padding: 10px 12px;
   transition: all 0.2s;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
@@ -657,17 +642,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .note-timestamp {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--primary-color);
   cursor: pointer;
-  padding: 2px 8px;
+  padding: 2px 6px;
   background: #ede9fe;
-  border-radius: 4px;
+  border-radius: 3px;
   font-family: monospace;
   transition: background-color 0.2s;
 }
@@ -680,9 +665,9 @@ body {
   background: none;
   border: none;
   color: var(--text-secondary);
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -700,23 +685,41 @@ body {
 }
 
 .note-content {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--text-primary);
-  line-height: 1.5;
-  margin-bottom: 12px;
+  line-height: 1.4;
+  margin-bottom: 8px;
   word-break: break-word;
+  /* Limit to 2-3 lines with truncation */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* Fade-out gradient for truncated content */
+  position: relative;
+}
+
+.note-content::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 1.4em;
+  background: linear-gradient(to right, transparent, white);
+  pointer-events: none;
 }
 
 .note-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
 }
 
 .tag {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 11px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
