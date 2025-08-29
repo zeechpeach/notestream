@@ -743,144 +743,176 @@ function deleteNoteFromDashboard(noteId) {
   updateTagFilters();
 }
 
+// Edit note modal state
+let currentEditingNote = null;
+let currentEditingTags = [];
+
 // Show edit note modal
 function showEditNoteModal(note) {
-  const modal = document.createElement('div');
-  modal.className = 'modal';
+  const modal = document.getElementById('edit-note-modal');
+  if (!modal) {
+    console.error('Edit note modal not found');
+    return;
+  }
+
+  currentEditingNote = note;
+  currentEditingTags = [...(note.tags || [])];
+
+  // Populate form with note data
+  const editTextarea = document.getElementById('edit-note-text');
+  if (editTextarea) {
+    editTextarea.value = note.text || '';
+  }
+
+  // Populate tags
+  updateEditTagDisplay();
+
+  // Populate smart suggestions
+  updateEditTagSuggestions();
+
+  // Clear previous event listeners and add new ones
+  setupEditModalEventListeners();
+
+  // Show modal
+  modal.classList.remove('hidden');
+}
+
+// Update tag display for edit modal
+function updateEditTagDisplay() {
+  const currentTagsContainer = document.getElementById('current-tags');
+  const availableTagsContainer = document.getElementById('available-tags');
   
+  if (!currentTagsContainer || !availableTagsContainer) return;
+
+  // Update current tags
+  currentTagsContainer.innerHTML = '';
+  currentEditingTags.forEach(tag => {
+    const tagElement = document.createElement('span');
+    tagElement.className = 'tag editable-tag';
+    const { bgColor, textColor } = generateTagColors(tag);
+    tagElement.style.backgroundColor = bgColor;
+    tagElement.style.color = textColor;
+    tagElement.style.border = `1px solid ${textColor}`;
+    
+    tagElement.innerHTML = `
+      ${tag}
+      <span class="remove-tag" data-tag="${tag}">×</span>
+    `;
+    currentTagsContainer.appendChild(tagElement);
+  });
+
+  // Update available tags
   const allAvailableTags = [...new Set([...globalTags, ...allTags.map(t => t.name)])];
+  const availableTags = allAvailableTags.filter(tag => !currentEditingTags.includes(tag));
   
-  modal.innerHTML = `
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Edit Note</h3>
-        <button class="close-modal">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Note Content</label>
-          <textarea id="edit-note-text" rows="4">${note.text}</textarea>
-        </div>
-        <div class="form-group">
-          <label>Tags</label>
-          <div class="tags-input">
-            <div class="current-tags" id="current-tags">
-              <!-- Will be populated by updateTagDisplay -->
-            </div>
-            <div class="available-tags">
-              <!-- Will be populated by updateTagDisplay -->
-            </div>
-            <div class="new-tag-input">
-              <input type="text" id="new-tag-input" placeholder="Add new tag...">
-              <button id="add-new-tag">Add</button>
-            </div>
-            
-            <!-- Smart suggestions -->
-            <div class="smart-suggestions">
-              <h5>💡 Smart Suggestions:</h5>
-              <div id="tag-suggestions">
-                ${suggestTagsForNote(note.text, note.videoInfo).map(tag => {
-                  const { bgColor, textColor } = generateTagColors(tag);
-                  return `<span class="tag suggested-tag" data-tag="${tag}" style="background-color: ${bgColor}; color: ${textColor}; border: 1px solid ${textColor};">${tag}</span>`;
-                }).join('')}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="cancel-edit" class="secondary-button">Cancel</button>
-        <button id="save-edit" class="primary-button">Save Changes</button>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-  
-  // Event handlers
-  let currentTags = [...(note.tags || [])];
-  
-  // Initialize tag display with colors
-  updateTagDisplay();
-  
-  modal.querySelector('.close-modal').addEventListener('click', () => document.body.removeChild(modal));
-  modal.querySelector('#cancel-edit').addEventListener('click', () => document.body.removeChild(modal));
-  
-  // Remove tag handler
+  availableTagsContainer.innerHTML = '<h5>Available Tags:</h5>';
+  availableTags.forEach(tag => {
+    const tagElement = document.createElement('span');
+    tagElement.className = 'tag available-tag';
+    tagElement.dataset.tag = tag;
+    const { bgColor, textColor } = generateTagColors(tag);
+    tagElement.style.backgroundColor = bgColor;
+    tagElement.style.color = textColor;
+    tagElement.style.border = `1px solid ${textColor}`;
+    tagElement.textContent = tag;
+    availableTagsContainer.appendChild(tagElement);
+  });
+}
+
+// Update smart tag suggestions for edit modal
+function updateEditTagSuggestions() {
+  const suggestionsContainer = document.getElementById('tag-suggestions');
+  if (!suggestionsContainer || !currentEditingNote) return;
+
+  const suggestions = suggestTagsForNote(currentEditingNote.text, currentEditingNote.videoInfo);
+  suggestionsContainer.innerHTML = suggestions.map(tag => {
+    const { bgColor, textColor } = generateTagColors(tag);
+    return `<span class="tag suggested-tag" data-tag="${tag}" style="background-color: ${bgColor}; color: ${textColor}; border: 1px solid ${textColor};">${tag}</span>`;
+  }).join('');
+}
+
+// Setup event listeners for edit modal (with cleanup)
+function setupEditModalEventListeners() {
+  const modal = document.getElementById('edit-note-modal');
+  if (!modal) return;
+
+  // Clear any existing listeners by cloning elements
+  const closeBtn = document.getElementById('edit-close-modal');
+  const cancelBtn = document.getElementById('cancel-edit');
+  const saveBtn = document.getElementById('save-edit');
+  const addTagBtn = document.getElementById('add-new-tag');
+
+  // Close modal handlers
+  const closeModal = () => {
+    modal.classList.add('hidden');
+    currentEditingNote = null;
+    currentEditingTags = [];
+  };
+
+  if (closeBtn) {
+    closeBtn.replaceWith(closeBtn.cloneNode(true));
+    document.getElementById('edit-close-modal').addEventListener('click', closeModal);
+  }
+
+  if (cancelBtn) {
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+    document.getElementById('cancel-edit').addEventListener('click', closeModal);
+  }
+
+  // Save handler
+  if (saveBtn) {
+    saveBtn.replaceWith(saveBtn.cloneNode(true));
+    document.getElementById('save-edit').addEventListener('click', () => {
+      const editTextarea = document.getElementById('edit-note-text');
+      const newText = editTextarea ? editTextarea.value.trim() : '';
+      
+      if (newText && currentEditingNote) {
+        updateNoteInDashboard(currentEditingNote.id, newText, currentEditingTags);
+        closeModal();
+      }
+    });
+  }
+
+  // Add new tag handler
+  if (addTagBtn) {
+    addTagBtn.replaceWith(addTagBtn.cloneNode(true));
+    document.getElementById('add-new-tag').addEventListener('click', () => {
+      const newTagInput = document.getElementById('new-tag-input');
+      const newTag = newTagInput ? newTagInput.value.trim() : '';
+      
+      if (newTag && !currentEditingTags.includes(newTag)) {
+        currentEditingTags.push(newTag);
+        addToGlobalTags(newTag);
+        updateEditTagDisplay();
+        if (newTagInput) newTagInput.value = '';
+      }
+    });
+  }
+
+  // Tag interaction handlers (delegated)
   modal.addEventListener('click', (e) => {
     if (e.target.classList.contains('remove-tag')) {
       const tag = e.target.dataset.tag;
-      currentTags = currentTags.filter(t => t !== tag);
-      updateTagDisplay();
-    }
-  });
-  
-  // Add tag handlers
-  modal.addEventListener('click', (e) => {
-    if (e.target.classList.contains('available-tag') || e.target.classList.contains('suggested-tag')) {
+      currentEditingTags = currentEditingTags.filter(t => t !== tag);
+      updateEditTagDisplay();
+    } else if (e.target.classList.contains('available-tag') || e.target.classList.contains('suggested-tag')) {
       const tag = e.target.dataset.tag;
-      if (!currentTags.includes(tag)) {
-        currentTags.push(tag);
-        updateTagDisplay();
+      if (tag && !currentEditingTags.includes(tag)) {
+        currentEditingTags.push(tag);
+        updateEditTagDisplay();
       }
     }
   });
-  
-  // New tag handler
-  modal.querySelector('#add-new-tag').addEventListener('click', () => {
-    const newTag = modal.querySelector('#new-tag-input').value.trim();
-    if (newTag && !currentTags.includes(newTag)) {
-      currentTags.push(newTag);
-      addToGlobalTags(newTag); // Add to persistent global tags
-      updateTagDisplay();
-      modal.querySelector('#new-tag-input').value = '';
-    }
-  });
-  
-  // Save handler
-  modal.querySelector('#save-edit').addEventListener('click', () => {
-    const newText = modal.querySelector('#edit-note-text').value.trim();
-    if (newText) {
-      updateNoteInDashboard(note.id, newText, currentTags);
-      document.body.removeChild(modal);
-    }
-  });
-  
-  function updateTagDisplay() {
-    const currentTagsContainer = modal.querySelector('#current-tags');
-    const availableTagsContainer = modal.querySelector('.available-tags');
-    const allAvailableTags = [...new Set([...globalTags, ...allTags.map(t => t.name)])];
-    
-    // Update current tags with colors
-    currentTagsContainer.innerHTML = '';
-    currentTags.forEach(tag => {
-      const tagElement = document.createElement('span');
-      tagElement.className = 'tag editable-tag';
-      const { bgColor, textColor } = generateTagColors(tag);
-      tagElement.style.backgroundColor = bgColor;
-      tagElement.style.color = textColor;
-      tagElement.style.border = `1px solid ${textColor}`;
-      
-      tagElement.innerHTML = `
-        ${tag}
-        <span class="remove-tag" data-tag="${tag}">×</span>
-      `;
-      currentTagsContainer.appendChild(tagElement);
-    });
-    
-    // Update available tags with colors
-    const availableTags = allAvailableTags.filter(tag => !currentTags.includes(tag));
-    availableTagsContainer.innerHTML = '<h5>Available Tags:</h5>';
-    availableTags.forEach(tag => {
-      const tagElement = document.createElement('span');
-      tagElement.className = 'tag available-tag';
-      tagElement.dataset.tag = tag;
-      const { bgColor, textColor } = generateTagColors(tag);
-      tagElement.style.backgroundColor = bgColor;
-      tagElement.style.color = textColor;
-      tagElement.style.border = `1px solid ${textColor}`;
-      tagElement.textContent = tag;
-      availableTagsContainer.appendChild(tagElement);
+
+  // Enter key handler for new tag input
+  const newTagInput = document.getElementById('new-tag-input');
+  if (newTagInput) {
+    newTagInput.replaceWith(newTagInput.cloneNode(true));
+    document.getElementById('new-tag-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('add-new-tag').click();
+      }
     });
   }
 }

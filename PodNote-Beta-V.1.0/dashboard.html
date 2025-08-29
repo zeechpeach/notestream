@@ -195,6 +195,49 @@
     </div>
   </div>
   
+  <!-- Edit Note Modal -->
+  <div id="edit-note-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit Note</h3>
+        <button class="close-modal" id="edit-close-modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Note Content</label>
+          <textarea id="edit-note-text" rows="4" placeholder="Enter your note content..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Tags</label>
+          <div class="tags-input">
+            <div class="current-tags" id="current-tags">
+              <!-- Current tags will be populated here -->
+            </div>
+            <div class="available-tags" id="available-tags">
+              <!-- Available tags will be populated here -->
+            </div>
+            <div class="new-tag-input">
+              <input type="text" id="new-tag-input" placeholder="Add new tag...">
+              <button id="add-new-tag">Add</button>
+            </div>
+            
+            <!-- Smart suggestions -->
+            <div class="smart-suggestions">
+              <h5>💡 Smart Suggestions:</h5>
+              <div id="tag-suggestions">
+                <!-- Tag suggestions will be populated here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-edit" class="secondary-button">Cancel</button>
+        <button id="save-edit" class="primary-button">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Export Modal -->
   <div id="export-modal" class="modal hidden">
     <div class="modal-content">
