@@ -1858,6 +1858,10 @@ function handleParentMessages(event) {
     case 'timeUpdate':
       updateCurrentTime(message.currentTime);
       break;
+      
+    case 'playStateChanged':
+      updatePlayPauseIcon(message.isPlaying);
+      break;
   }
 }
 

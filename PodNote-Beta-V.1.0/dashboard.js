@@ -42,6 +42,143 @@ let filteredNotes = [];
 let activeTagFilter = null;
 let selectedNotesForExport = new Set(); // Track selected notes for export
 let contentThemes = {}; // Analytics data
+let dashboardRichEditor = null; // Rich editor instance for dashboard
+
+// Native Rich Text Editor Configuration (copied from sidebar.js)
+class NativeRichEditor {
+  constructor(container, options = {}) {
+    this.container = typeof container === 'string' ? document.querySelector(container) : container;
+    this.toolbar = this.container.previousElementSibling;
+    this.options = {
+      placeholder: 'Enter your note content...',
+      ...options
+    };
+    
+    this.init();
+  }
+  
+  init() {
+    // Set placeholder
+    this.container.setAttribute('data-placeholder', this.options.placeholder);
+    
+    // Handle placeholder visibility
+    this.updatePlaceholder();
+    
+    // Set up event listeners
+    this.setupEventListeners();
+    
+    // Initialize toolbar
+    this.setupToolbar();
+  }
+  
+  setupEventListeners() {
+    // Handle placeholder
+    this.container.addEventListener('input', () => this.updatePlaceholder());
+    this.container.addEventListener('focus', () => this.updatePlaceholder());
+    this.container.addEventListener('blur', () => this.updatePlaceholder());
+    
+    // Handle keyboard shortcuts
+    this.container.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
+    
+    // Prevent default behavior for some commands
+    this.container.addEventListener('paste', (e) => this.handlePaste(e));
+  }
+  
+  setupToolbar() {
+    if (!this.toolbar) return;
+    
+    this.toolbar.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-command]');
+      if (!btn) return;
+      
+      e.preventDefault();
+      const command = btn.getAttribute('data-command');
+      this.executeCommand(command);
+    });
+  }
+  
+  updatePlaceholder() {
+    const isEmpty = this.container.textContent.trim() === '' || 
+                   (this.container.innerHTML === '<p><br></p>' || this.container.innerHTML === '<br>');
+    this.container.classList.toggle('empty', isEmpty);
+    
+    // Ensure we have at least one paragraph for consistent behavior
+    if (isEmpty && this.container.innerHTML === '') {
+      this.container.innerHTML = '<p><br></p>';
+    }
+  }
+  
+  executeCommand(command) {
+    document.execCommand(command, false, null);
+    this.container.focus();
+    this.updatePlaceholder();
+  }
+  
+  handleKeyboardShortcuts(e) {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case 'b':
+          e.preventDefault();
+          this.executeCommand('bold');
+          break;
+        case 'i':
+          e.preventDefault();
+          this.executeCommand('italic');
+          break;
+        case 'u':
+          e.preventDefault();
+          this.executeCommand('underline');
+          break;
+      }
+    }
+  }
+  
+  handlePaste(e) {
+    // Allow paste but clean up formatting if needed
+    setTimeout(() => {
+      this.updatePlaceholder();
+    }, 0);
+  }
+  
+  // API methods
+  getText() {
+    return this.container.textContent || '';
+  }
+
+  setContents(content) {
+    if (typeof content === 'string') {
+      // Handle both HTML content and plain text
+      if (content.includes('<') && content.includes('>')) {
+        this.container.innerHTML = content;
+      } else {
+        this.container.textContent = content;
+      }
+    } else {
+      // Fallback - convert to string
+      this.container.textContent = String(content || '');
+    }
+    this.updatePlaceholder();
+  }
+
+  setText(text) {
+    this.container.textContent = text || '';
+    this.updatePlaceholder();
+  }
+
+  get root() {
+    return {
+      innerHTML: this.container.innerHTML
+    };
+  }
+
+  focus() {
+    this.container.focus();
+  }
+  
+  blur() {
+    this.container.blur();
+  }
+}
 
 // Helper functions for tags
 // Helper function to generate consistent colors for tags
@@ -758,10 +895,24 @@ function showEditNoteModal(note) {
   currentEditingNote = note;
   currentEditingTags = [...(note.tags || [])];
 
-  // Populate form with note data
-  const editTextarea = document.getElementById('edit-note-text');
-  if (editTextarea) {
-    editTextarea.value = note.text || '';
+  // Initialize rich editor if not already done
+  if (!dashboardRichEditor) {
+    const editorElement = document.getElementById('dashboard-rich-editor');
+    if (editorElement) {
+      dashboardRichEditor = new NativeRichEditor('#dashboard-rich-editor', {
+        placeholder: 'Enter your note content...'
+      });
+    }
+  }
+
+  // Populate form with note data using rich editor
+  if (dashboardRichEditor) {
+    // Check if note has rich content or plain text
+    if (note.richContent) {
+      dashboardRichEditor.setContents(note.richContent);
+    } else {
+      dashboardRichEditor.setText(note.text || '');
+    }
   }
 
   // Populate tags
@@ -863,12 +1014,14 @@ function setupEditModalEventListeners() {
   if (saveBtn) {
     saveBtn.replaceWith(saveBtn.cloneNode(true));
     document.getElementById('save-edit').addEventListener('click', () => {
-      const editTextarea = document.getElementById('edit-note-text');
-      const newText = editTextarea ? editTextarea.value.trim() : '';
-      
-      if (newText && currentEditingNote) {
-        updateNoteInDashboard(currentEditingNote.id, newText, currentEditingTags);
-        closeModal();
+      if (dashboardRichEditor && currentEditingNote) {
+        const newText = dashboardRichEditor.getText().trim();
+        const newRichContent = dashboardRichEditor.root.innerHTML;
+        
+        if (newText) {
+          updateNoteInDashboard(currentEditingNote.id, newText, currentEditingTags, newRichContent);
+          closeModal();
+        }
       }
     });
   }
@@ -918,13 +1071,18 @@ function setupEditModalEventListeners() {
 }
 
 // Update note in dashboard
-function updateNoteInDashboard(noteId, newText, newTags) {
+function updateNoteInDashboard(noteId, newText, newTags, newRichContent = null) {
   const noteIndex = allNotes.findIndex(note => note.id === noteId);
   if (noteIndex === -1) return;
   
   allNotes[noteIndex].text = newText;
   allNotes[noteIndex].tags = newTags;
   allNotes[noteIndex].updatedAt = new Date().toISOString();
+  
+  // Update rich content if provided
+  if (newRichContent) {
+    allNotes[noteIndex].richContent = newRichContent;
+  }
   
   // Add new tags to global tags
   newTags.forEach(tag => addToGlobalTags(tag));
