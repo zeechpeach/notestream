@@ -349,7 +349,6 @@ const elements = {
   
   // Export Modal
   exportModal: document.getElementById('export-modal'),
-  closeModalBtn: document.querySelector('.close-modal'),
   exportFormatSelect: document.getElementById('export-format'),
   includeTimestampsCheckbox: document.getElementById('include-timestamps'),
   includeTagsCheckbox: document.getElementById('include-tags'),
@@ -474,10 +473,7 @@ if (elements.exportAllDataBtn) {
     elements.rememberChannelsCheckbox.addEventListener('change', saveSettings);
   }
   
-  // Export modal
-  if (elements.closeModalBtn) {
-    elements.closeModalBtn.addEventListener('click', closeExportModal);
-  }
+  // Export modal (Cancel button only)
   if (elements.cancelExportBtn) {
     elements.cancelExportBtn.addEventListener('click', closeExportModal);
   }
@@ -1305,8 +1301,7 @@ function showSelectiveExportModal(exportType) {
     updateSelectionCount();
   });
   
-  // Close modal
-  modal.querySelector('.close-modal').addEventListener('click', () => document.body.removeChild(modal));
+  // Close modal (Cancel button only)
   modal.querySelector('#cancel-export').addEventListener('click', () => document.body.removeChild(modal));
   
   // Confirm export

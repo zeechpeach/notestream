@@ -856,14 +856,6 @@ function setupExportModalEvents() {
       elements.exportModal.classList.add('hidden');
     });
   }
-  
-  // Close modal
-  const closeModalBtn = modal.querySelector('.close-modal');
-  if (closeModalBtn) {
-    closeModalBtn.addEventListener('click', () => {
-      elements.exportModal.classList.add('hidden');
-    });
-  }
 }
 
 function updateExportSelectionCount(count) {
