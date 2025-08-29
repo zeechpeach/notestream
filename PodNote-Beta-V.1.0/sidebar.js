@@ -44,6 +44,12 @@ const elements = {
   playPauseIcon: document.getElementById('play-pause-icon'),
   forward5sBtn: document.getElementById('forward-5s'),
   
+  // Quick video controls (near note-taking area)
+  quickRewind5sBtn: document.getElementById('quick-rewind-5s'),
+  quickPlayPauseBtn: document.getElementById('quick-play-pause'),
+  quickPlayPauseIcon: document.getElementById('quick-play-pause-icon'),
+  quickForward5sBtn: document.getElementById('quick-forward-5s'),
+  
   // Modals
   editModal: document.getElementById('edit-modal'),
   exportModal: document.getElementById('export-modal'),
@@ -346,6 +352,7 @@ function updateAllTagsList() {
 
 // Video Controls Integration
 function setupVideoControls() {
+  // Header controls
   if (elements.rewind5sBtn) {
     elements.rewind5sBtn.addEventListener('click', () => {
       requestCurrentTime();
@@ -371,6 +378,33 @@ function setupVideoControls() {
       }, 100);
     });
   }
+  
+  // Quick controls (near note-taking area)
+  if (elements.quickRewind5sBtn) {
+    elements.quickRewind5sBtn.addEventListener('click', () => {
+      requestCurrentTime();
+      setTimeout(() => {
+        const currentTime = parseTimestamp(elements.noteTimestamp.textContent);
+        jumpToTimestamp(Math.max(0, currentTime - 5));
+      }, 100);
+    });
+  }
+  
+  if (elements.quickPlayPauseBtn) {
+    elements.quickPlayPauseBtn.addEventListener('click', () => {
+      togglePlayPause();
+    });
+  }
+  
+  if (elements.quickForward5sBtn) {
+    elements.quickForward5sBtn.addEventListener('click', () => {
+      requestCurrentTime();
+      setTimeout(() => {
+        const currentTime = parseTimestamp(elements.noteTimestamp.textContent);
+        jumpToTimestamp(currentTime + 5);
+      }, 100);
+    });
+  }
 }
 
 // Play/Pause functionality
@@ -379,16 +413,22 @@ function togglePlayPause() {
 }
 
 function updatePlayPauseIcon(isPlaying) {
+  const playIcon = '<path d="M8 5v14l11-7z"/>';
+  const pauseIcon = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+  
+  const iconToShow = isPlaying ? pauseIcon : playIcon;
+  const titleText = isPlaying ? 'Pause video' : 'Play video';
+  
+  // Update header play/pause button
   if (elements.playPauseIcon) {
-    if (isPlaying) {
-      // Show pause icon
-      elements.playPauseIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-      elements.playPauseBtn.title = 'Pause video';
-    } else {
-      // Show play icon
-      elements.playPauseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
-      elements.playPauseBtn.title = 'Play video';
-    }
+    elements.playPauseIcon.innerHTML = iconToShow;
+    elements.playPauseBtn.title = titleText;
+  }
+  
+  // Update quick play/pause button
+  if (elements.quickPlayPauseIcon) {
+    elements.quickPlayPauseIcon.innerHTML = iconToShow;
+    elements.quickPlayPauseBtn.title = titleText;
   }
 }
 

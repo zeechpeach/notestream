@@ -764,18 +764,10 @@ function showEditNoteModal(note) {
           <label>Tags</label>
           <div class="tags-input">
             <div class="current-tags" id="current-tags">
-              ${(note.tags || []).map(tag => `
-                <span class="tag editable-tag">
-                  ${tag}
-                  <span class="remove-tag" data-tag="${tag}">×</span>
-                </span>
-              `).join('')}
+              <!-- Will be populated by updateTagDisplay -->
             </div>
             <div class="available-tags">
-              <h5>Available Tags:</h5>
-              ${allAvailableTags.filter(tag => !(note.tags || []).includes(tag)).map(tag => `
-                <span class="tag available-tag" data-tag="${tag}">${tag}</span>
-              `).join('')}
+              <!-- Will be populated by updateTagDisplay -->
             </div>
             <div class="new-tag-input">
               <input type="text" id="new-tag-input" placeholder="Add new tag...">
@@ -786,9 +778,10 @@ function showEditNoteModal(note) {
             <div class="smart-suggestions">
               <h5>💡 Smart Suggestions:</h5>
               <div id="tag-suggestions">
-                ${suggestTagsForNote(note.text, note.videoInfo).map(tag => `
-                  <span class="tag suggested-tag" data-tag="${tag}">${tag}</span>
-                `).join('')}
+                ${suggestTagsForNote(note.text, note.videoInfo).map(tag => {
+                  const { bgColor, textColor } = generateTagColors(tag);
+                  return `<span class="tag suggested-tag" data-tag="${tag}" style="background-color: ${bgColor}; color: ${textColor}; border: 1px solid ${textColor};">${tag}</span>`;
+                }).join('')}
               </div>
             </div>
           </div>
@@ -805,6 +798,9 @@ function showEditNoteModal(note) {
   
   // Event handlers
   let currentTags = [...(note.tags || [])];
+  
+  // Initialize tag display with colors
+  updateTagDisplay();
   
   modal.querySelector('.close-modal').addEventListener('click', () => document.body.removeChild(modal));
   modal.querySelector('#cancel-edit').addEventListener('click', () => document.body.removeChild(modal));
@@ -854,20 +850,37 @@ function showEditNoteModal(note) {
     const availableTagsContainer = modal.querySelector('.available-tags');
     const allAvailableTags = [...new Set([...globalTags, ...allTags.map(t => t.name)])];
     
-    currentTagsContainer.innerHTML = currentTags.map(tag => `
-      <span class="tag editable-tag">
+    // Update current tags with colors
+    currentTagsContainer.innerHTML = '';
+    currentTags.forEach(tag => {
+      const tagElement = document.createElement('span');
+      tagElement.className = 'tag editable-tag';
+      const { bgColor, textColor } = generateTagColors(tag);
+      tagElement.style.backgroundColor = bgColor;
+      tagElement.style.color = textColor;
+      tagElement.style.border = `1px solid ${textColor}`;
+      
+      tagElement.innerHTML = `
         ${tag}
         <span class="remove-tag" data-tag="${tag}">×</span>
-      </span>
-    `).join('');
+      `;
+      currentTagsContainer.appendChild(tagElement);
+    });
     
+    // Update available tags with colors
     const availableTags = allAvailableTags.filter(tag => !currentTags.includes(tag));
-    availableTagsContainer.innerHTML = `
-      <h5>Available Tags:</h5>
-      ${availableTags.map(tag => `
-        <span class="tag available-tag" data-tag="${tag}">${tag}</span>
-      `).join('')}
-    `;
+    availableTagsContainer.innerHTML = '<h5>Available Tags:</h5>';
+    availableTags.forEach(tag => {
+      const tagElement = document.createElement('span');
+      tagElement.className = 'tag available-tag';
+      tagElement.dataset.tag = tag;
+      const { bgColor, textColor } = generateTagColors(tag);
+      tagElement.style.backgroundColor = bgColor;
+      tagElement.style.color = textColor;
+      tagElement.style.border = `1px solid ${textColor}`;
+      tagElement.textContent = tag;
+      availableTagsContainer.appendChild(tagElement);
+    });
   }
 }
 
@@ -998,7 +1011,10 @@ function showSelectiveExportModal(exportType) {
                       <div class="note-preview">
                         <span class="note-timestamp">${note.timestampFormatted}</span>
                         <span class="note-text">${note.text.substring(0, 100)}${note.text.length > 100 ? '...' : ''}</span>
-                        ${note.tags ? `<div class="note-tags-preview">${note.tags.map(tag => `<span class="tag-mini">${tag}</span>`).join('')}</div>` : ''}
+                        ${note.tags ? `<div class="note-tags-preview">${note.tags.map(tag => {
+                          const { bgColor, textColor } = generateTagColors(tag);
+                          return `<span class="tag-mini" style="background-color: ${bgColor}; color: ${textColor}; border: 1px solid ${textColor};">${tag}</span>`;
+                        }).join('')}</div>` : ''}
                       </div>
                     </label>
                   `).join('')}
@@ -1806,10 +1822,11 @@ function renderVideoNotes(videoId, notes) {
         const tagElement = document.createElement('span');
         tagElement.className = 'tag';
         
-        const tagClasses = ['tag-action', 'tag-question', 'tag-book', 'tag-quote', 'tag-idea', 'tag-ai'];
-        const charCode = tag.charCodeAt(0) || 0;
-        const tagClass = tagClasses[charCode % tagClasses.length];
-        tagElement.classList.add(tagClass);
+        // Generate colors for the tag
+        const { bgColor, textColor } = generateTagColors(tag);
+        tagElement.style.backgroundColor = bgColor;
+        tagElement.style.color = textColor;
+        tagElement.style.border = `1px solid ${textColor}`;
         
         tagElement.textContent = tag;
         

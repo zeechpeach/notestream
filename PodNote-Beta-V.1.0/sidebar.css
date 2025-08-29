@@ -134,6 +134,49 @@ body {
   margin-bottom: 12px;
 }
 
+/* Quick Video Controls (positioned near note-taking area) */
+.quick-video-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.quick-control-btn {
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-control-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.current-time {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: monospace;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
 .timestamp-control {
   display: flex;
   align-items: center;
@@ -435,24 +478,8 @@ body {
 /* Save Controls */
 .save-controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-}
-
-.time-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-#note-timestamp {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-family: monospace;
-  background: var(--bg-secondary);
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
 }
 
 .save-btn {
