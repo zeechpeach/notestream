@@ -302,6 +302,23 @@ function handleSidebarMessages(event) {
       toggleSidebar();
       break;
       
+    case 'togglePlayPause':
+      // Toggle play/pause state of the YouTube video
+      const video = document.querySelector('video');
+      if (video) {
+        if (video.paused) {
+          video.play();
+        } else {
+          video.pause();
+        }
+        // Send back the new state to update UI
+        event.source.postMessage({
+          action: 'playStateChanged',
+          isPlaying: !video.paused
+        }, '*');
+      }
+      break;
+      
     case 'sidebarReady':
       // If the sidebar is telling us it's ready, send the current video info
       const videoInfo = getVideoInfo();

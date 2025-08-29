@@ -313,6 +313,18 @@ body {
   color: var(--text-secondary);
   pointer-events: none;
   position: absolute;
+  font-style: italic;
+}
+
+/* Ensure placeholder appears when editor is empty */
+.rich-editor:empty,
+.rich-editor.empty {
+  position: relative;
+}
+
+.rich-editor:focus:empty::before,
+.rich-editor:focus.empty::before {
+  opacity: 0.5; /* Make placeholder slightly transparent when focused */
 }
 
 /* Quick Tags Section */
@@ -612,10 +624,14 @@ body {
 #notes-list {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 10px 20px 20px;
   background: var(--bg-secondary);
   min-height: 0; /* Ensure flex item can shrink */
-  max-height: calc(100vh - 400px); /* Ensure scrollable area has proper height */
+  /* Remove max-height constraint to allow full flex growth */
+  /* Ensure smooth scrolling */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .note-item {
@@ -1336,6 +1352,7 @@ body {
   height: 100vh;
   width: 100%;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Prevent page scrolling when scrolling sidebar content */
 }
 
 /* Animations */
