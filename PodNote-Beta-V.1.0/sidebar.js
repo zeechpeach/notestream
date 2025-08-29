@@ -40,6 +40,8 @@ const elements = {
   
   // Video controls
   rewind5sBtn: document.getElementById('rewind-5s'),
+  playPauseBtn: document.getElementById('play-pause'),
+  playPauseIcon: document.getElementById('play-pause-icon'),
   forward5sBtn: document.getElementById('forward-5s'),
   
   // Modals
@@ -354,6 +356,12 @@ function setupVideoControls() {
     });
   }
   
+  if (elements.playPauseBtn) {
+    elements.playPauseBtn.addEventListener('click', () => {
+      togglePlayPause();
+    });
+  }
+  
   if (elements.forward5sBtn) {
     elements.forward5sBtn.addEventListener('click', () => {
       requestCurrentTime();
@@ -362,6 +370,25 @@ function setupVideoControls() {
         jumpToTimestamp(currentTime + 5);
       }, 100);
     });
+  }
+}
+
+// Play/Pause functionality
+function togglePlayPause() {
+  window.parent.postMessage({ action: 'togglePlayPause' }, '*');
+}
+
+function updatePlayPauseIcon(isPlaying) {
+  if (elements.playPauseIcon) {
+    if (isPlaying) {
+      // Show pause icon
+      elements.playPauseIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+      elements.playPauseBtn.title = 'Pause video';
+    } else {
+      // Show play icon
+      elements.playPauseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+      elements.playPauseBtn.title = 'Play video';
+    }
   }
 }
 
@@ -1382,6 +1409,67 @@ function toggleTagsDropdown() {
   elements.tagsDropdown.classList.toggle('hidden');
 }
 
+function showFilterDropdown() {
+  // Get unique tags from current video notes
+  const uniqueTags = getUniqueTagsFromCurrentVideo();
+  
+  if (uniqueTags.length === 0) {
+    showNotification('No tags found in current video notes', 'info');
+    return;
+  }
+  
+  // Create and show filter dropdown
+  const filterDropdown = document.createElement('div');
+  filterDropdown.className = 'filter-dropdown';
+  filterDropdown.innerHTML = `
+    <div class="filter-dropdown-content">
+      <h4>Filter by Tag</h4>
+      <div class="filter-options">
+        <button class="filter-option ${!activeTagFilter ? 'active' : ''}" data-tag="">
+          All Notes
+        </button>
+        ${uniqueTags.map(tag => `
+          <button class="filter-option ${activeTagFilter === tag ? 'active' : ''}" data-tag="${tag}">
+            ${tag}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  
+  // Position near filter button
+  const rect = elements.filterButton.getBoundingClientRect();
+  filterDropdown.style.position = 'absolute';
+  filterDropdown.style.top = (rect.bottom + 5) + 'px';
+  filterDropdown.style.right = '20px';
+  filterDropdown.style.zIndex = '1000';
+  
+  document.body.appendChild(filterDropdown);
+  
+  // Add event listeners
+  filterDropdown.querySelectorAll('.filter-option').forEach(option => {
+    option.addEventListener('click', () => {
+      const tag = option.dataset.tag;
+      if (tag) {
+        setTagFilter(tag);
+      } else {
+        clearTagFilter();
+      }
+      document.body.removeChild(filterDropdown);
+    });
+  });
+  
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', function closeFilter(e) {
+      if (!filterDropdown.contains(e.target) && e.target !== elements.filterButton) {
+        document.body.removeChild(filterDropdown);
+        document.removeEventListener('click', closeFilter);
+      }
+    });
+  }, 0);
+}
+
 function suggestTagsForNote(noteText, videoInfo) {
   const suggestions = [];
   const text = noteText.toLowerCase();
@@ -1798,7 +1886,7 @@ function setupEventListeners() {
   }
   
   if (elements.filterButton) {
-    elements.filterButton.addEventListener('click', toggleTagsDropdown);
+    elements.filterButton.addEventListener('click', showFilterDropdown);
   }
   
   if (elements.exportNotesBtn) {
