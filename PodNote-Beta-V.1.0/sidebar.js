@@ -104,8 +104,14 @@ class NativeRichEditor {
   }
   
   updatePlaceholder() {
-    const isEmpty = this.container.textContent.trim() === '';
+    const isEmpty = this.container.textContent.trim() === '' || 
+                   (this.container.innerHTML === '<p><br></p>' || this.container.innerHTML === '<br>');
     this.container.classList.toggle('empty', isEmpty);
+    
+    // Ensure we have at least one paragraph for consistent behavior
+    if (isEmpty && this.container.innerHTML === '') {
+      this.container.innerHTML = '<p><br></p>';
+    }
   }
   
   executeCommand(command) {
@@ -182,9 +188,19 @@ class NativeRichEditor {
   
   setContents(content) {
     if (typeof content === 'string') {
-      this.container.innerHTML = content;
-    } else if (content.ops) {
-      this.container.textContent = content.ops.map(op => op.insert).join('');
+      // If it's HTML content (from old Quill or rich content), set as innerHTML
+      if (content.includes('<') && content.includes('>')) {
+        this.container.innerHTML = content;
+      } else {
+        // Plain text
+        this.container.textContent = content;
+      }
+    } else if (content && content.ops) {
+      // Quill Delta format - extract text content
+      this.container.textContent = content.ops.map(op => op.insert || '').join('');
+    } else if (content) {
+      // Fallback - try to convert to string
+      this.container.textContent = String(content);
     }
     this.updatePlaceholder();
   }
@@ -610,6 +626,83 @@ function setupExportModalEvents() {
   const modal = elements.exportModal;
   let selectedNotesForExport = new Set();
   
+  // Tab functionality
+  const tabButtons = modal.querySelectorAll('.tab-btn');
+  const tabPanes = modal.querySelectorAll('.tab-pane');
+  
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+      
+      // Update active tab button
+      tabButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update active tab pane
+      tabPanes.forEach(pane => pane.classList.remove('active'));
+      const targetPane = modal.querySelector(`#${targetTab}-tab`);
+      if (targetPane) {
+        targetPane.classList.add('active');
+      }
+      
+      // Update preview if preview tab is selected
+      if (targetTab === 'preview') {
+        updateExportPreview(selectedNotesForExport);
+      }
+    });
+  });
+  
+  // Function to update export preview
+  function updateExportPreview(selectedNotes) {
+    const previewElement = document.getElementById('export-preview-content');
+    if (!previewElement) return;
+    
+    const format = document.getElementById('export-format')?.value || 'markdown';
+    const includeTimestamps = document.getElementById('include-timestamps')?.checked ?? true;
+    const includeTags = document.getElementById('include-tags')?.checked ?? true;
+    const groupByVideo = document.getElementById('group-by-video')?.checked ?? true;
+    
+    const selectedNotesList = notesList.filter(note => selectedNotes.has(note.id));
+    
+    if (selectedNotesList.length === 0) {
+      previewElement.textContent = 'No notes selected. Please select notes from the "Select Notes" tab to see a preview.';
+      return;
+    }
+    
+    let previewContent = '';
+    
+    try {
+      switch (format) {
+        case 'markdown':
+          previewContent = generateLessonPlanExport(selectedNotesList, includeTimestamps, includeTags, groupByVideo);
+          break;
+        case 'study-guide':
+          previewContent = generateStudyGuideExport(selectedNotesList, includeTimestamps, includeTags, groupByVideo);
+          break;
+        case 'text':
+          previewContent = generateTextExport(selectedNotesList, includeTimestamps, includeTags, groupByVideo);
+          break;
+        case 'json':
+          previewContent = JSON.stringify(selectedNotesList, null, 2);
+          break;
+        case 'csv':
+          previewContent = generateCsvExport(selectedNotesList, includeTimestamps, includeTags);
+          break;
+        default:
+          previewContent = 'Preview not available for this format.';
+      }
+      
+      // Limit preview to first 1000 characters for performance
+      if (previewContent.length > 1000) {
+        previewContent = previewContent.substring(0, 1000) + '\n\n... (preview truncated - full content will be exported)';
+      }
+      
+      previewElement.textContent = previewContent;
+    } catch (error) {
+      previewElement.textContent = 'Error generating preview: ' + error.message;
+    }
+  }
+  
   // Note selection handling
   modal.addEventListener('change', (e) => {
     if (e.target.classList.contains('note-select')) {
@@ -620,6 +713,10 @@ function setupExportModalEvents() {
         selectedNotesForExport.delete(noteId);
       }
       updateExportSelectionCount(selectedNotesForExport.size);
+      // Update preview if preview tab is active
+      if (modal.querySelector('#preview-tab').classList.contains('active')) {
+        updateExportPreview(selectedNotesForExport);
+      }
     }
     
     if (e.target.classList.contains('video-select')) {
@@ -636,6 +733,22 @@ function setupExportModalEvents() {
         }
       });
       updateExportSelectionCount(selectedNotesForExport.size);
+      // Update preview if preview tab is active
+      if (modal.querySelector('#preview-tab').classList.contains('active')) {
+        updateExportPreview(selectedNotesForExport);
+      }
+    }
+  });
+  
+  // Update preview when export settings change
+  ['export-format', 'include-timestamps', 'include-tags', 'group-by-video'].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('change', () => {
+        if (modal.querySelector('#preview-tab').classList.contains('active')) {
+          updateExportPreview(selectedNotesForExport);
+        }
+      });
     }
   });
   
@@ -653,6 +766,10 @@ function setupExportModalEvents() {
         checkbox.checked = true;
       });
       updateExportSelectionCount(selectedNotesForExport.size);
+      // Update preview if preview tab is active
+      if (modal.querySelector('#preview-tab').classList.contains('active')) {
+        updateExportPreview(selectedNotesForExport);
+      }
     });
   }
   
@@ -663,6 +780,10 @@ function setupExportModalEvents() {
       });
       selectedNotesForExport.clear();
       updateExportSelectionCount(0);
+      // Update preview if preview tab is active
+      if (modal.querySelector('#preview-tab').classList.contains('active')) {
+        updateExportPreview(selectedNotesForExport);
+      }
     });
   }
   
