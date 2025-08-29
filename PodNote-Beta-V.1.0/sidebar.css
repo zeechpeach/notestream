@@ -197,9 +197,9 @@ body {
   background: #059669;
 }
 
-/* Native Rich Text Editor Container */
+/* Native Rich Text Editor Container - Optimized for space */
 .rich-editor-container {
-  margin-bottom: 12px;
+  margin-bottom: 8px; /* Reduced from 12px for space optimization */
 }
 
 /* Rich Text Toolbar */
@@ -261,8 +261,8 @@ body {
 }
 
 .rich-editor:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  outline: none;
+  /* Removed intrusive blue border for cleaner writing experience */
 }
 
 .rich-editor p {
@@ -312,42 +312,62 @@ body {
   opacity: 0.5; /* Make placeholder slightly transparent when focused */
 }
 
-/* Quick Tags Section - Inline Layout */
+/* Quick Tags Section - More Compact Layout */
 .quick-tags {
-  margin-bottom: 6px;
+  margin-bottom: 4px; /* Reduced from 6px */
 }
 
 .tags-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  flex-wrap: wrap;
+  gap: 6px; /* Reduced from 8px */
+  margin-bottom: 4px; /* Reduced from 6px */
+  flex-wrap: nowrap; /* Changed to nowrap for more compact layout */
 }
 
 .quick-tags h5 {
-  font-size: 12px;
+  font-size: 11px; /* Reduced from 12px */
   color: var(--text-secondary);
   font-weight: 500;
   flex-shrink: 0;
+  margin-right: 2px; /* Add small margin */
 }
 
 .recent-tags {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  flex-wrap: nowrap; /* Changed from wrap to nowrap */
+  gap: 3px; /* Reduced from 4px */
   flex: 1;
-  min-height: 24px;
+  min-height: 20px; /* Reduced from 24px */
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: hidden;
+  scrollbar-width: thin; /* Firefox */
+}
+
+/* Custom scrollbar for recent tags */
+.recent-tags::-webkit-scrollbar {
+  height: 3px;
+}
+
+.recent-tags::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.recent-tags::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
 }
 
 .quick-tag {
-  padding: 3px 6px;
-  border-radius: 3px;
-  font-size: 11px;
+  padding: 2px 5px; /* Reduced from 3px 6px */
+  border-radius: 10px; /* More pill-shaped, increased from 3px */
+  font-size: 10px; /* Reduced from 11px */
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid transparent;
+  white-space: nowrap; /* Prevent text wrapping */
+  flex-shrink: 0; /* Prevent shrinking in horizontal layout */
 }
 
 .quick-tag:hover {
@@ -359,12 +379,13 @@ body {
   background: none;
   border: 1px dashed var(--border-color);
   color: var(--text-secondary);
-  padding: 3px 6px;
-  border-radius: 3px;
-  font-size: 11px;
+  padding: 2px 5px; /* Reduced from 3px 6px */
+  border-radius: 10px; /* More pill-shaped, increased from 3px */
+  font-size: 10px; /* Reduced from 11px */
   cursor: pointer;
   transition: all 0.2s;
   flex-shrink: 0;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .more-tags-btn:hover {
@@ -372,10 +393,10 @@ body {
   color: var(--primary-color);
 }
 
-/* Tag Suggestions Section */
+/* Tag Suggestions Section - More Compact */
 .tag-suggestions {
-  margin-top: 12px;
-  padding: 10px;
+  margin-top: 8px; /* Reduced from 12px */
+  padding: 8px; /* Reduced from 10px */
   background: linear-gradient(135deg, #fef3c7, #fde68a);
   border: 1px solid #f59e0b;
   border-radius: 8px;
@@ -383,30 +404,30 @@ body {
 }
 
 .tag-suggestions h6 {
-  font-size: 12px;
+  font-size: 11px; /* Reduced from 12px */
   color: #b45309;
-  margin-bottom: 8px;
+  margin-bottom: 6px; /* Reduced from 8px */
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px; /* Reduced from 6px */
 }
 
 .tag-suggestions h6::before {
   content: "✨";
-  font-size: 14px;
+  font-size: 12px; /* Reduced from 14px */
 }
 
 .suggested-tags-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px; /* Reduced from 6px */
 }
 
 .suggested-tag {
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 3px 8px; /* Reduced from 4px 10px */
+  border-radius: 10px; /* More pill-shaped, increased from 4px */
+  font-size: 10px; /* Reduced from 12px */
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -415,6 +436,7 @@ body {
   color: #b45309;
   position: relative;
   overflow: hidden;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .suggested-tag:hover {
@@ -439,30 +461,51 @@ body {
   }
 }
 
-/* Save Controls */
+/* Save Controls - Adjusted for compact layout */
 .save-controls {
   display: flex;
   justify-content: flex-end;
-  margin-top: 6px;
+  margin-top: 4px; /* Reduced from 6px since tags are now above */
 }
 
-/* Selected Tags Display */
+/* Selected Tags Display - Compact Layout */
 .selected-tags {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
-  min-height: 24px;
+  flex-wrap: nowrap; /* Changed from wrap to nowrap for horizontal scrolling */
+  gap: 4px; /* Reduced from 6px */
+  margin-bottom: 4px; /* Reduced from 8px */
+  margin-top: 4px; /* Added small top margin */
+  min-height: 20px; /* Reduced from 24px */
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: hidden;
+  padding: 2px 0; /* Add small vertical padding */
+  scrollbar-width: thin; /* Firefox */
+}
+
+/* Custom scrollbar for selected tags */
+.selected-tags::-webkit-scrollbar {
+  height: 3px;
+}
+
+.selected-tags::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.selected-tags::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
 }
 
 .selected-tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  gap: 4px; /* Reduced from 6px */
+  padding: 2px 6px; /* Reduced from 4px 8px */
+  border-radius: 12px; /* More pill-shaped, increased from 4px */
+  font-size: 11px; /* Reduced from 12px */
   font-weight: 500;
+  white-space: nowrap; /* Prevent text wrapping */
+  flex-shrink: 0; /* Prevent shrinking in horizontal layout */
 }
 
 .selected-tag .remove-tag {
@@ -470,11 +513,12 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 14px; /* Reduced from 16px */
+  height: 14px; /* Reduced from 16px */
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.1);
   transition: background-color 0.2s;
+  font-size: 10px; /* Added smaller font size */
 }
 
 .selected-tag .remove-tag:hover {
