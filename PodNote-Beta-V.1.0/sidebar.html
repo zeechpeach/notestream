@@ -34,47 +34,43 @@
       </div>
     </div>
     
-    <!-- Compact Video Info -->
+    <!-- Compact Video Info - Single Line -->
     <div class="video-info">
-      <h4 class="subtitle">CURRENT VIDEO</h4>
-      <h3 id="video-title">Loading...</h3>
-      <p id="video-meta">Loading...</p>
+      <div class="video-info-compact">
+        📺 <span id="video-title">Loading...</span> • <span id="video-meta">Loading...</span>
+      </div>
     </div>
     
     <!-- Enhanced Note Taking Section -->
     <div class="quick-add">
-      <div class="note-header">
-        <h4 class="subtitle">ADD NOTE</h4>
-        <div class="timestamp-control">
-          <span id="capture-time">Capture: --:--</span>
-          <button id="use-current-time" class="time-btn" title="Use current video time (Ctrl/Cmd+T)">
+      <!-- Consolidated Timestamp and Video Controls -->
+      <div class="compact-controls">
+        <span id="capture-time">Capture: --:--</span>
+        <div class="control-buttons">
+          <button id="quick-rewind-5s" class="quick-control-btn" title="Rewind 5 seconds">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              <path d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+              <text x="12" y="16" text-anchor="middle" font-size="8" fill="currentColor">5</text>
+            </svg>
+          </button>
+          <button id="quick-play-pause" class="quick-control-btn" title="Play/Pause video">
+            <svg id="quick-play-pause-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+          <button id="quick-forward-5s" class="quick-control-btn" title="Forward 5 seconds">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/>
+              <text x="12" y="16" text-anchor="middle" font-size="8" fill="currentColor">5</text>
             </svg>
           </button>
         </div>
-      </div>
-      
-      <!-- Quick Video Controls near note-taking area -->
-      <div class="quick-video-controls">
-        <button id="quick-rewind-5s" class="quick-control-btn" title="Rewind 5 seconds">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
-            <text x="12" y="16" text-anchor="middle" font-size="8" fill="currentColor">5</text>
-          </svg>
-        </button>
-        <button id="quick-play-pause" class="quick-control-btn" title="Play/Pause video">
-          <svg id="quick-play-pause-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-        </button>
-        <button id="quick-forward-5s" class="quick-control-btn" title="Forward 5 seconds">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/>
-            <text x="12" y="16" text-anchor="middle" font-size="8" fill="currentColor">5</text>
-          </svg>
-        </button>
         <span class="current-time">Now: <span id="note-timestamp">--:--</span></span>
+        <button id="use-current-time" class="time-btn" title="Use current video time (Ctrl/Cmd+T)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </button>
       </div>
       
       <!-- Native Rich Text Editor -->
@@ -124,9 +120,12 @@
       
       <!-- Quick Tag Selection -->
       <div class="quick-tags">
-        <h5>Quick Tags:</h5>
-        <div class="recent-tags" id="recent-tags">
-          <!-- Recently used tags appear here -->
+        <div class="tags-row">
+          <h5>Quick Tags:</h5>
+          <div class="recent-tags" id="recent-tags">
+            <!-- Recently used tags appear here -->
+          </div>
+          <button id="more-tags" class="more-tags-btn">+ More</button>
         </div>
         
         <!-- Tag Suggestions Section -->
@@ -137,14 +136,8 @@
           </div>
         </div>
         
-        <!-- Combined More Tags and Save Controls -->
-        <div class="tags-save-controls">
-          <button id="more-tags" class="more-tags-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-            </svg>
-            More Tags
-          </button>
+        <!-- Save Controls -->
+        <div class="save-controls">
           <button id="save-note" class="save-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
